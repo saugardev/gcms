@@ -1,0 +1,2299 @@
+{
+  "evaluation_version": "2.0",
+  "engine": "python",
+  "software": {
+    "mafer-gcms": "0.1.0",
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "rainbow-api": "1.5.2"
+  },
+  "synthetic_matching": "Maximum-cardinality time-only matching within 0.75 seconds, then minimum total time error. Competing compatible pairs have null identity/area metrics.",
+  "synthetic": {
+    "isolated": {
+      "expected": 2,
+      "detected": 2,
+      "matched": 2,
+      "false_detections": 0,
+      "missed": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "matches": [
+        {
+          "component_id": "component-0001",
+          "expected_name": "synthetic-1",
+          "apex_error_seconds": 0.0,
+          "correspondence_ambiguous": false,
+          "relative_area_error": 0.010618965573733747,
+          "top_group_contains_expected_name": true,
+          "status": "tentative"
+        },
+        {
+          "component_id": "component-0002",
+          "expected_name": "synthetic-2",
+          "apex_error_seconds": 0.0,
+          "correspondence_ambiguous": false,
+          "relative_area_error": 0.010751593607633765,
+          "top_group_contains_expected_name": true,
+          "status": "tentative"
+        }
+      ],
+      "matching_tolerance_seconds": 0.75,
+      "uniquely_assessable_matches": 2,
+      "wrong_tentative_matches": 0
+    },
+    "overlap": {
+      "expected": 2,
+      "detected": 2,
+      "matched": 2,
+      "false_detections": 0,
+      "missed": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "matches": [
+        {
+          "component_id": "component-0001",
+          "expected_name": "synthetic-1",
+          "apex_error_seconds": 0.0,
+          "correspondence_ambiguous": false,
+          "relative_area_error": 0.001169712931482513,
+          "top_group_contains_expected_name": true,
+          "status": "tentative"
+        },
+        {
+          "component_id": "component-0002",
+          "expected_name": "synthetic-2",
+          "apex_error_seconds": 0.0,
+          "correspondence_ambiguous": false,
+          "relative_area_error": 0.06534380990640062,
+          "top_group_contains_expected_name": true,
+          "status": "tentative"
+        }
+      ],
+      "matching_tolerance_seconds": 0.75,
+      "uniquely_assessable_matches": 2,
+      "wrong_tentative_matches": 0
+    },
+    "blank": {
+      "expected": 0,
+      "detected": 0,
+      "matched": 0,
+      "false_detections": 0,
+      "missed": 0,
+      "precision": null,
+      "recall": null,
+      "matches": [],
+      "matching_tolerance_seconds": 0.75,
+      "uniquely_assessable_matches": 0,
+      "wrong_tentative_matches": 0
+    }
+  },
+  "stress": {
+    "protocol": "synthetic-stress-1",
+    "parameters": {
+      "smoothing_seconds": 0.8,
+      "baseline_seconds": 60.0,
+      "min_width_seconds": 0.6,
+      "max_width_seconds": 30.0,
+      "coapex_seconds": 0.5,
+      "noise_multiplier": 8.0,
+      "min_ions": 3,
+      "relative_ion_threshold": 0.01,
+      "min_component_fraction": 0.001,
+      "match_threshold": 0.75,
+      "ambiguity_margin": 0.03,
+      "top_k": 3
+    },
+    "seeds": [
+      17,
+      29,
+      43
+    ],
+    "case_count": 48,
+    "case_count_with_missed_components": 19,
+    "case_count_with_extra_detections": 0,
+    "case_count_with_wrong_tentative_match": 3,
+    "interpretation": "Constructed stress cases expose failure modes, not population accuracy. All cases and seeds are retained. Co-elution can make time-based identity and area attribution ambiguous (null). The nearby decoy deliberately demonstrates that spectral similarity cannot establish chemical identity.",
+    "cases": [
+      {
+        "scenario": "separation-0-ratio-1",
+        "settings": {
+          "separation_seconds": 0.0,
+          "second_ratio": 1.0,
+          "noise_std": 5.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "b6a5c87119c1de95c440b72edde1b555ac46d85c14a246e495879f7cb0124a8f",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "ambiguous"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "ambiguous": 1
+        },
+        "warning_counts": {
+          "similar_candidate_scores": 1
+        }
+      },
+      {
+        "scenario": "separation-0-ratio-1",
+        "settings": {
+          "separation_seconds": 0.0,
+          "second_ratio": 1.0,
+          "noise_std": 5.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "e7632d53861a381220065a21ba253b9752c4fa797cd54f2e48e953f723e9a52c",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "ambiguous"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "ambiguous": 1
+        },
+        "warning_counts": {
+          "similar_candidate_scores": 1
+        }
+      },
+      {
+        "scenario": "separation-0-ratio-1",
+        "settings": {
+          "separation_seconds": 0.0,
+          "second_ratio": 1.0,
+          "noise_std": 5.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "4049bbc4f08973f470a71304581e04b7bc9ff7cd0883941427ac367b0e11665c",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "ambiguous"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "ambiguous": 1
+        },
+        "warning_counts": {
+          "similar_candidate_scores": 1
+        }
+      },
+      {
+        "scenario": "separation-0-ratio-0.1",
+        "settings": {
+          "separation_seconds": 0.0,
+          "second_ratio": 0.1,
+          "noise_std": 5.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "557645f939db15bf974b54f30761c134789d50357497f280f7bb3149af685e91",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0-ratio-0.1",
+        "settings": {
+          "separation_seconds": 0.0,
+          "second_ratio": 0.1,
+          "noise_std": 5.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "4ff5926c3b362dab78ba9b4dfb70a8ecea3287626a750eaf599a1e3378e1ebf9",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0-ratio-0.1",
+        "settings": {
+          "separation_seconds": 0.0,
+          "second_ratio": 0.1,
+          "noise_std": 5.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "b3ba4377f82da84d5c070935b41d0d5107ab553f2683198a0271eeb78552b4b3",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0-ratio-0.01",
+        "settings": {
+          "separation_seconds": 0.0,
+          "second_ratio": 0.01,
+          "noise_std": 5.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "24a5e9da835b0a785565aa8a8354c1e1dc3b7d18f35b787e433bb44a4dc8e3dc",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0-ratio-0.01",
+        "settings": {
+          "separation_seconds": 0.0,
+          "second_ratio": 0.01,
+          "noise_std": 5.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "80ce22b2f090240b6d87e97fa2be302728c4b9cce5a0bfdf812ef3d157504bf2",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0-ratio-0.01",
+        "settings": {
+          "separation_seconds": 0.0,
+          "second_ratio": 0.01,
+          "noise_std": 5.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "524d45325e8a751fb9daf00b1b1a8eab59bff5ea11ca449e80b347d6d7689cd8",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0.5-ratio-1",
+        "settings": {
+          "separation_seconds": 0.5,
+          "second_ratio": 1.0,
+          "noise_std": 5.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "a93d61dda72df7085e5229dc8587bbfcd461f008281f8cfd9fa22091c909f999",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0.5-ratio-1",
+        "settings": {
+          "separation_seconds": 0.5,
+          "second_ratio": 1.0,
+          "noise_std": 5.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "58cd005ac378d57feb39121049747ba0571856d3408ca77610a3bbd63f0c881c",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0.5-ratio-1",
+        "settings": {
+          "separation_seconds": 0.5,
+          "second_ratio": 1.0,
+          "noise_std": 5.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "b3067298f74031b95931fe4d6c2fcc995e47f8e71a009dca17368af65e6ac086",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0.5-ratio-0.1",
+        "settings": {
+          "separation_seconds": 0.5,
+          "second_ratio": 0.1,
+          "noise_std": 5.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "62470eff28428caec6e28654450eff9eb358cff3656d0ff2eeb40e838228132e",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0.5-ratio-0.1",
+        "settings": {
+          "separation_seconds": 0.5,
+          "second_ratio": 0.1,
+          "noise_std": 5.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "a6b87f8e8eba7c9df9232a415798c02f9028ac8a3f991319c3efd21c9bb96b94",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0.5-ratio-0.1",
+        "settings": {
+          "separation_seconds": 0.5,
+          "second_ratio": 0.1,
+          "noise_std": 5.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "1885c081b8f963beaa986105973905246aaf7a0ac9548a3df3487ac04098f021",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0.5-ratio-0.01",
+        "settings": {
+          "separation_seconds": 0.5,
+          "second_ratio": 0.01,
+          "noise_std": 5.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "86c19de02d335b279b2942a518d4728c18c71375521e7452cc5c30ce32b6cbab",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0.5-ratio-0.01",
+        "settings": {
+          "separation_seconds": 0.5,
+          "second_ratio": 0.01,
+          "noise_std": 5.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "ec90a71e6f739ce96dca64af1c9e1d25a55509d3cdaa6a006fb2781295d928ba",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-0.5-ratio-0.01",
+        "settings": {
+          "separation_seconds": 0.5,
+          "second_ratio": 0.01,
+          "noise_std": 5.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "18a4d12b49422b2312abf006ecaf9d12859af9ad61f8e51ecc8e80f911a0c0e9",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": true,
+              "relative_area_error": null,
+              "top_group_contains_expected_name": null,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-1.5-ratio-1",
+        "settings": {
+          "separation_seconds": 1.5,
+          "second_ratio": 1.0,
+          "noise_std": 5.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "82ddecafc255c97497daf5371f142aaca7c4519e42668dc78f58d3a8e05f5670",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.062153203055036015,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.09557520150134802,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 2
+        }
+      },
+      {
+        "scenario": "separation-1.5-ratio-1",
+        "settings": {
+          "separation_seconds": 1.5,
+          "second_ratio": 1.0,
+          "noise_std": 5.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "94944b536c4361617655c7a48cfe5772cfb066b8db6c429f1e9ebb60c6a7792b",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.06163921497906483,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.09517785795412526,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 2
+        }
+      },
+      {
+        "scenario": "separation-1.5-ratio-1",
+        "settings": {
+          "separation_seconds": 1.5,
+          "second_ratio": 1.0,
+          "noise_std": 5.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "e67c1f237561a4afc65dd8953ed92f9fde1a947e0810215b47192e24f6e57c33",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.06160645976400301,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.09506988421618776,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 2
+        }
+      },
+      {
+        "scenario": "separation-1.5-ratio-0.1",
+        "settings": {
+          "separation_seconds": 1.5,
+          "second_ratio": 0.1,
+          "noise_std": 5.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "2b409979c8be506d6aa52a537b7efc32d5428a0ea42c98a42a59ced32e51c6e2",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.0014424434123847054,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.08579949655805348,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 1
+        }
+      },
+      {
+        "scenario": "separation-1.5-ratio-0.1",
+        "settings": {
+          "separation_seconds": 1.5,
+          "second_ratio": 0.1,
+          "noise_std": 5.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "7b70fdfcd804687909d07e9ae2867b460b5213fd7fecb2794a46e6a8e49556ca",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.00195643148835589,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.08153607579233906,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 1
+        }
+      },
+      {
+        "scenario": "separation-1.5-ratio-0.1",
+        "settings": {
+          "separation_seconds": 1.5,
+          "second_ratio": 0.1,
+          "noise_std": 5.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "7557d46f921744821b4e4801759e91b6956e3c75a92022341c2b371e26fecb51",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.0019891867034179853,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.08074630662391166,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 1
+        }
+      },
+      {
+        "scenario": "separation-1.5-ratio-0.01",
+        "settings": {
+          "separation_seconds": 1.5,
+          "second_ratio": 0.01,
+          "noise_std": 5.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "6ccf3b3e89988c86cf7326301d54515519432f1a5585553ae95b012978e176d4",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.0078020080591269594,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 1,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-1.5-ratio-0.01",
+        "settings": {
+          "separation_seconds": 1.5,
+          "second_ratio": 0.01,
+          "noise_std": 5.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "7fc89fc3a8575240f2b55d33ca417c628ac77a99d7bfe97c0d33bae96d69cc5a",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.008315996135098144,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.13522798112253934,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 1
+        }
+      },
+      {
+        "scenario": "separation-1.5-ratio-0.01",
+        "settings": {
+          "separation_seconds": 1.5,
+          "second_ratio": 0.01,
+          "noise_std": 5.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "398e36b3a2c2bd9f0373e4894382156a554f62149fe3068a80b5850ecdbe1fdc",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.008348751350159958,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 1,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-3-ratio-1",
+        "settings": {
+          "separation_seconds": 3.0,
+          "second_ratio": 1.0,
+          "noise_std": 5.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "1e0ed233b3f498ae2221446c2173572512b43a6a80f1933d7d5db33cff5dc56c",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.01050787568741062,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.029027868676688558,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 1
+        }
+      },
+      {
+        "scenario": "separation-3-ratio-1",
+        "settings": {
+          "separation_seconds": 3.0,
+          "second_ratio": 1.0,
+          "noise_std": 5.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "bc9746b3a2a4c24007d7be7228da2f7452002ebaba40efd748eaeb253b3f8d3c",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.009993887611439154,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.02940564670740252,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 1
+        }
+      },
+      {
+        "scenario": "separation-3-ratio-1",
+        "settings": {
+          "separation_seconds": 3.0,
+          "second_ratio": 1.0,
+          "noise_std": 5.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "768f2b75b00f39f4c145b0654cc709faf765c22cde35cb3bdba80f28ab379446",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.00996113239637762,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.029505717641744506,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 1
+        }
+      },
+      {
+        "scenario": "separation-3-ratio-0.1",
+        "settings": {
+          "separation_seconds": 3.0,
+          "second_ratio": 0.1,
+          "noise_std": 5.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "2d8af282b8a511fbb5d0276617eb0224a1ba7ee0f5d47f7a9364b8247b4bd783",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.006606976149147188,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.08482746495978286,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 1
+        }
+      },
+      {
+        "scenario": "separation-3-ratio-0.1",
+        "settings": {
+          "separation_seconds": 3.0,
+          "second_ratio": 0.1,
+          "noise_std": 5.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "ee36a368db15990b2eadd4d40d461d3479c68acdcd185d14c98e70595c0e7935",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.007120964225118653,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.08045230108471298,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 1
+        }
+      },
+      {
+        "scenario": "separation-3-ratio-0.1",
+        "settings": {
+          "separation_seconds": 3.0,
+          "second_ratio": 0.1,
+          "noise_std": 5.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "cad7edac06b04754c55a28e4097f0134970d79621e5348cb6fe2c28d9a3b2081",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.007153719440180469,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.080198806195179,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 1
+        }
+      },
+      {
+        "scenario": "separation-3-ratio-0.01",
+        "settings": {
+          "separation_seconds": 3.0,
+          "second_ratio": 0.01,
+          "noise_std": 5.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "d32739b47a85dafc47b137a1c8f5100c9ab8f1861974a2482bd3f71cf8386262",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.008318461332803026,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 1,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-3-ratio-0.01",
+        "settings": {
+          "separation_seconds": 3.0,
+          "second_ratio": 0.01,
+          "noise_std": 5.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "22a863e96879bb139183dad0641d8e8b25a6aba5506cf7f70ffca71082335ab2",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.00883244940877421,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 1,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "separation-3-ratio-0.01",
+        "settings": {
+          "separation_seconds": 3.0,
+          "second_ratio": 0.01,
+          "noise_std": 5.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "e70eb7eb159ba82783807de3702ad48d03fd09a12bf4dafdd9e2155dfb6f70e8",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.008865204623836165,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.19999999999999574,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.2765058313297896,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {
+          "possible_coelution_or_spectral_change": 1
+        }
+      },
+      {
+        "scenario": "weak-noisy",
+        "settings": {
+          "second_ratio": 0.001,
+          "noise_std": 25.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "0da137dd68e0c2378f0f4707aff2ac82f4c9ebc0feb2625c5d3ed58d4f60e45b",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.0005232869634185612,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 1,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "weak-noisy",
+        "settings": {
+          "second_ratio": 0.001,
+          "noise_std": 25.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "7ec35e1251201fb78e9ec8e89e984adfa3ce8fc387cd0ec0164d1e190e43439c",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.001585164290121233,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 1,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "weak-noisy",
+        "settings": {
+          "second_ratio": 0.001,
+          "noise_std": 25.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "c3ae2004bfb7453b52239fdbc5d60f9cff6c75c0a66295234c100ef2e292c49f",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 2,
+          "detected": 1,
+          "matched": 1,
+          "false_detections": 0,
+          "missed": 1,
+          "precision": 1.0,
+          "recall": 0.5,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.0011046506012331342,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 1,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "noisy-blank",
+        "settings": {
+          "kind": "blank",
+          "noise_std": 25.0
+        },
+        "seed": 17,
+        "reference_mode": "complete",
+        "input_array_sha256": "b0656f038e9b616034b0c2ae79d9397d9f0e1a113fa900df5fb4e86dd2ecbaeb",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 0,
+          "detected": 0,
+          "matched": 0,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": null,
+          "recall": null,
+          "matches": [],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {},
+        "warning_counts": {}
+      },
+      {
+        "scenario": "noisy-blank",
+        "settings": {
+          "kind": "blank",
+          "noise_std": 25.0
+        },
+        "seed": 29,
+        "reference_mode": "complete",
+        "input_array_sha256": "69086216d0b8a776ab5c5ed970eb4caafef23da9d960a65e1604f6d13283b985",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 0,
+          "detected": 0,
+          "matched": 0,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": null,
+          "recall": null,
+          "matches": [],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {},
+        "warning_counts": {}
+      },
+      {
+        "scenario": "noisy-blank",
+        "settings": {
+          "kind": "blank",
+          "noise_std": 25.0
+        },
+        "seed": 43,
+        "reference_mode": "complete",
+        "input_array_sha256": "77ecb098cf348e940cd4bc97e726096bb42550d3fcaddaf4df613c0275701958",
+        "synthetic_library_sha256": "0793bec2fc837367ecd9332078b831268f0689a29251565b1faeb5aa4c6a04c2",
+        "metrics": {
+          "expected": 0,
+          "detected": 0,
+          "matched": 0,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": null,
+          "recall": null,
+          "matches": [],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 0,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {},
+        "warning_counts": {}
+      },
+      {
+        "scenario": "missing-reference",
+        "settings": {},
+        "seed": 17,
+        "reference_mode": "missing",
+        "input_array_sha256": "be95a70517da891f515d8aad1a7b887ed834bf4c7c60841ff61b70f602df02af",
+        "synthetic_library_sha256": "4d93fe62c0f8e4e8accbfa338e759507d22ea82b91e3c3c41a6904d8840a6623",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.010656075325135713,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.01071732449899331,
+              "top_group_contains_expected_name": false,
+              "status": "unassigned"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1,
+          "unassigned": 1
+        },
+        "warning_counts": {
+          "no_candidate_passes_screening": 1
+        }
+      },
+      {
+        "scenario": "missing-reference",
+        "settings": {},
+        "seed": 29,
+        "reference_mode": "missing",
+        "input_array_sha256": "3dcbc9da7fa91eab5ef3e036426603f370caafad188fe817f6730371164a4608",
+        "synthetic_library_sha256": "4d93fe62c0f8e4e8accbfa338e759507d22ea82b91e3c3c41a6904d8840a6623",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.010654782146327027,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.010736857646540029,
+              "top_group_contains_expected_name": false,
+              "status": "unassigned"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1,
+          "unassigned": 1
+        },
+        "warning_counts": {
+          "no_candidate_passes_screening": 1
+        }
+      },
+      {
+        "scenario": "missing-reference",
+        "settings": {},
+        "seed": 43,
+        "reference_mode": "missing",
+        "input_array_sha256": "2f58e2f9c3664dbe08820f2473cffbaee3e67982051a6717ef4a35a5bf5722df",
+        "synthetic_library_sha256": "4d93fe62c0f8e4e8accbfa338e759507d22ea82b91e3c3c41a6904d8840a6623",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.010661541330526774,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.010710415620879106,
+              "top_group_contains_expected_name": false,
+              "status": "unassigned"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 0
+        },
+        "statuses": {
+          "tentative": 1,
+          "unassigned": 1
+        },
+        "warning_counts": {
+          "no_candidate_passes_screening": 1
+        }
+      },
+      {
+        "scenario": "similar-wrong-reference",
+        "settings": {},
+        "seed": 17,
+        "reference_mode": "nearby_decoy",
+        "input_array_sha256": "be95a70517da891f515d8aad1a7b887ed834bf4c7c60841ff61b70f602df02af",
+        "synthetic_library_sha256": "b5838e006bf409c46d9c45feb1c768f324f0d1548e3f6871a4b6682ed5be8bce",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.010656075325135713,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.01071732449899331,
+              "top_group_contains_expected_name": false,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 1
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "similar-wrong-reference",
+        "settings": {},
+        "seed": 29,
+        "reference_mode": "nearby_decoy",
+        "input_array_sha256": "3dcbc9da7fa91eab5ef3e036426603f370caafad188fe817f6730371164a4608",
+        "synthetic_library_sha256": "b5838e006bf409c46d9c45feb1c768f324f0d1548e3f6871a4b6682ed5be8bce",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.010654782146327027,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.010736857646540029,
+              "top_group_contains_expected_name": false,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 1
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {}
+      },
+      {
+        "scenario": "similar-wrong-reference",
+        "settings": {},
+        "seed": 43,
+        "reference_mode": "nearby_decoy",
+        "input_array_sha256": "2f58e2f9c3664dbe08820f2473cffbaee3e67982051a6717ef4a35a5bf5722df",
+        "synthetic_library_sha256": "b5838e006bf409c46d9c45feb1c768f324f0d1548e3f6871a4b6682ed5be8bce",
+        "metrics": {
+          "expected": 2,
+          "detected": 2,
+          "matched": 2,
+          "false_detections": 0,
+          "missed": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "matches": [
+            {
+              "component_id": "component-0001",
+              "expected_name": "synthetic-1",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.010661541330526774,
+              "top_group_contains_expected_name": true,
+              "status": "tentative"
+            },
+            {
+              "component_id": "component-0002",
+              "expected_name": "synthetic-2",
+              "apex_error_seconds": 0.0,
+              "correspondence_ambiguous": false,
+              "relative_area_error": 0.010710415620879106,
+              "top_group_contains_expected_name": false,
+              "status": "tentative"
+            }
+          ],
+          "matching_tolerance_seconds": 0.75,
+          "uniquely_assessable_matches": 2,
+          "wrong_tentative_matches": 1
+        },
+        "statuses": {
+          "tentative": 2
+        },
+        "warning_counts": {}
+      }
+    ]
+  },
+  "interpretation": "Controlled signal tests validate mechanics, not chemical labels or real-sample accuracy.",
+  "real_sample_identification_accuracy": null,
+  "reason_accuracy_unmeasured": "No independently verified identities supplied.",
+  "sensitivity": [
+    {
+      "variant": "permissive",
+      "parameters": {
+        "smoothing_seconds": 0.8,
+        "baseline_seconds": 60.0,
+        "min_width_seconds": 0.6,
+        "max_width_seconds": 30.0,
+        "coapex_seconds": 0.5,
+        "noise_multiplier": 6.0,
+        "min_ions": 3,
+        "relative_ion_threshold": 0.01,
+        "min_component_fraction": 0.0005,
+        "match_threshold": 0.75,
+        "ambiguity_margin": 0.03,
+        "top_k": 3
+      },
+      "component_count": 800,
+      "statuses": {
+        "tentative": 31,
+        "unassigned": 719,
+        "ambiguous": 50
+      },
+      "component_ion_area_sum": 6412236623.150777,
+      "area_unit": "instrument intensity * second",
+      "area_percent_denominator": "sum of reported component-ion areas; not concentration",
+      "matched_default_components": 333,
+      "default_component_retention_fraction": 1.0,
+      "unchanged_top_group_fraction_among_matched": 0.8168168168168168,
+      "matching_tolerance_seconds": 0.75
+    },
+    {
+      "variant": "default",
+      "parameters": {
+        "smoothing_seconds": 0.8,
+        "baseline_seconds": 60.0,
+        "min_width_seconds": 0.6,
+        "max_width_seconds": 30.0,
+        "coapex_seconds": 0.5,
+        "noise_multiplier": 8.0,
+        "min_ions": 3,
+        "relative_ion_threshold": 0.01,
+        "min_component_fraction": 0.001,
+        "match_threshold": 0.75,
+        "ambiguity_margin": 0.03,
+        "top_k": 3
+      },
+      "component_count": 333,
+      "statuses": {
+        "unassigned": 263,
+        "ambiguous": 46,
+        "tentative": 24
+      },
+      "component_ion_area_sum": 6300411613.703763,
+      "area_unit": "instrument intensity * second",
+      "area_percent_denominator": "sum of reported component-ion areas; not concentration",
+      "matched_default_components": 333,
+      "default_component_retention_fraction": 1.0,
+      "unchanged_top_group_fraction_among_matched": 1.0,
+      "matching_tolerance_seconds": 0.75
+    },
+    {
+      "variant": "conservative",
+      "parameters": {
+        "smoothing_seconds": 0.8,
+        "baseline_seconds": 60.0,
+        "min_width_seconds": 0.6,
+        "max_width_seconds": 30.0,
+        "coapex_seconds": 0.5,
+        "noise_multiplier": 12.0,
+        "min_ions": 3,
+        "relative_ion_threshold": 0.01,
+        "min_component_fraction": 0.002,
+        "match_threshold": 0.75,
+        "ambiguity_margin": 0.03,
+        "top_k": 3
+      },
+      "component_count": 174,
+      "statuses": {
+        "unassigned": 111,
+        "ambiguous": 43,
+        "tentative": 20
+      },
+      "component_ion_area_sum": 6181394175.776362,
+      "area_unit": "instrument intensity * second",
+      "area_percent_denominator": "sum of reported component-ion areas; not concentration",
+      "matched_default_components": 174,
+      "default_component_retention_fraction": 0.5225225225225225,
+      "unchanged_top_group_fraction_among_matched": 0.867816091954023,
+      "matching_tolerance_seconds": 0.75
+    }
+  ],
+  "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+  "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d"
+}

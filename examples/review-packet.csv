@@ -1,0 +1,13 @@
+component_id,apex_minutes,candidate_names,identification_status,stability,matched_profiles,evaluated_profiles,selection_reason,review_status,analyst_identity,reviewer,notes
+component-0028,23.41765,"1,6,10-Dodecatrien-3-ol, 3,7,11-trimethyl-, (E)-",tentative,consistent,6,6,consistent tentative example,unreviewed,,,
+component-0031,23.60328333333333,α-Ionone / 1-Methyl-4-phenylpiperazine,unassigned,sensitive,6,6,unassigned example,unreviewed,,,
+component-0110,38.312866666666665,Myristic anhydride / Myristic anhydride,tentative,consistent,6,6,consistent tentative example,unreviewed,,,
+component-0128,40.1254,Amberonne (isomer 1) / Amberonne (isomer 1),ambiguous,sensitive,6,6,ambiguous library identity,unreviewed,,,
+component-0129,40.135533333333335,Iso E Super (6-1) / Iso E Super (6-2 main) / Iso E Super (6-3) / Iso E Super (6-4) / Iso E Super (6-5),unassigned,sensitive,2,6,unassigned example,unreviewed,,,
+component-0136,40.6857,Amberonne (isomer 3) / Amberonne (isomer 3) / Amberonne (isomer 3),ambiguous,sensitive,6,6,large reported area,unreviewed,,,
+component-0149,41.863683333333334,Majantol,ambiguous,consistent,6,6,large reported area,unreviewed,,,
+component-0155,42.25521666666667,Amberonne (isomer 3) / Amberonne (isomer 3) / Amberonne (isomer 3),ambiguous,consistent,6,6,large reported area,unreviewed,,,
+component-0186,45.55626666666667,"5-Azulenemethanol, 1,2,3,4,5,6,7,8-octahydro-α,α,3,8-tetramethyl-, acetate, [3S-(3α,5α,8α)]-",ambiguous,sensitive,6,6,large reported area,unreviewed,,,
+component-0207,47.0144,2-Isopropylidene-5-methylhex-4-enal,ambiguous,consistent,6,6,ambiguous library identity,unreviewed,,,
+component-0214,47.108916666666666,"1-Dodecanol, 3,7,11-trimethyl-",unassigned,sensitive,6,6,sensitive to processing settings,unreviewed,,,
+component-0246,49.62688333333333,"Myristoyl chloride / Myristoyl chloride / Octane, 1,1-diethoxy- / Myristoyl chloride",ambiguous,sensitive,6,6,sensitive to processing settings,unreviewed,,,

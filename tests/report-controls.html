@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Dashboard regression check</title>
+<h1>Dashboard regression check</h1>
+<p>Serve the repository root with <code>python -m http.server 8002 --bind 127.0.0.1</code>, then open this page.</p>
+<pre id="result" role="status">Running…</pre>
+<iframe title="Report under test" style="width:100%;height:600px"></iframe>
+<script>
+const frame = document.querySelector('iframe');
+const result = document.getElementById('result');
+function check(condition, message) { if (!condition) throw new Error(message); }
+async function load(path) {
+  await new Promise(resolve => { frame.onload = resolve; frame.src = path; });
+  const doc = frame.contentDocument;
+  check(!doc.getElementById('component-controls').hidden, 'Controls initialize');
+  return doc;
+}
+function set(doc, id, value, event = 'input') {
+  const input = doc.getElementById(id);
+  input.value = value;
+  input.dispatchEvent(new Event(event, {bubbles:true}));
+}
+function all(doc) { return [...doc.querySelectorAll('#components tbody tr')]; }
+function visible(doc) { return all(doc).filter(row => !row.hidden); }
+function count(doc, total, page = 1) {
+  const start = (page - 1) * 10;
+  check(visible(doc).length === Math.min(10, total - start), `Expected page ${page} of ${total} results`);
+  check(doc.querySelectorAll('#component-evidence > details:not([hidden])').length <= 1, 'Only selected evidence is shown');
+  check([...doc.querySelectorAll('svg a')].filter(a => a.style.display !== 'none').length === total, 'Markers include all filtered matches');
+  const text = doc.getElementById('component-count').textContent;
+  check(total ? text.startsWith(`Showing ${start + 1}–${Math.min(start + 10, total)} of ${total} components`) : text.startsWith('No matching components'), 'Accurate range and count');
+  check(doc.getElementById('component-page').value === String(page), 'Selected page');
+}
+function sort(doc, key) { doc.querySelector(`th[data-sort="${key}"] button`).click(); }
+function page(doc, action) { doc.querySelector(`[data-page="${action}"]`).click(); }
+(async () => {
+  let doc = await load('../examples/sample.html'); count(doc, 333);
+  check(doc.getElementById('evidence-hint').hidden === false, 'Inspector starts with a selection hint');
+  check(doc.querySelector('[data-page="previous"]').disabled, 'Previous disabled on page one');
+  page(doc, 'next'); count(doc, 333, 2);
+  check(visible(doc)[0].dataset.component === 'component-0011', 'Next page has new rows');
+  page(doc, 'last'); count(doc, 333, 34);
+  check(visible(doc)[0].dataset.component === 'component-0331', 'Last partial page');
+  check(doc.querySelector('[data-page="next"]').disabled, 'Next disabled on last page');
+  page(doc, 'previous'); count(doc, 333, 33);
+  set(doc, 'component-page', '12', 'change'); count(doc, 333, 12);
+  check(!doc.getElementById('component-stability'), 'Basic report has no stability filter');
+  set(doc, 'component-search', '  COMPONENT-0001  '); count(doc, 1);
+  set(doc, 'component-search', 'aCeToNiTrIlE');
+  check(visible(doc).some(row => row.dataset.component === 'component-0001'), 'Case-insensitive candidate search');
+  set(doc, 'component-search', '75-5-8');
+  check(visible(doc).some(row => row.dataset.component === 'component-0001'), 'CAS search');
+  set(doc, 'component-search', 'component-0001');
+  set(doc, 'component-status', 'tentative'); count(doc, 0);
+  check(!doc.getElementById('component-empty').hidden, 'Empty result message');
+  check(doc.querySelector('[data-page="next"]').disabled, 'No pages after empty result');
+  set(doc, 'component-search', ''); count(doc, 24);
+  page(doc, 'last'); count(doc, 24, 3);
+  doc.getElementById('component-reset').click(); count(doc, 333);
+  page(doc, 'last'); sort(doc, 'area'); count(doc, 333);
+  const areas = all(doc).map(row => Number(row.dataset.area));
+  check(areas.every((v, i) => !i || areas[i - 1] <= v), 'Sort applies across all pages');
+  sort(doc, 'area');
+  check(all(doc).every((row, i) => Number(row.dataset.area) === areas[areas.length - 1 - i]), 'Numeric descending area');
+  check(doc.querySelector('th[data-sort="area"]').getAttribute('aria-sort') === 'descending', 'Accessible direction');
+  // Near-equal scores and absent candidates, without changing saved scientific outputs.
+  doc.getElementById('component-reset').click();
+  const rows = all(doc);
+  rows.forEach(row => { row.dataset.score = ''; });
+  rows[0].dataset.score = '0.80004'; rows[1].dataset.score = '0.80003'; rows[2].dataset.score = '0.96';
+  sort(doc, 'score');
+  check(visible(doc)[0] === rows[1] && visible(doc)[1] === rows[0], 'Full precision scores');
+  check(visible(doc)[3].dataset.score === '', 'Missing scores last ascending');
+  sort(doc, 'score');
+  check(visible(doc)[0] === rows[2] && visible(doc)[3].dataset.score === '', 'Missing scores last descending');
+  doc = await load('../examples/review-packet.html'); count(doc, 12);
+  set(doc, 'component-stability', 'consistent'); count(doc, 5);
+  set(doc, 'component-stability', 'sensitive'); count(doc, 7);
+  set(doc, 'component-stability', 'inconclusive'); count(doc, 0);
+  doc.getElementById('component-reset').click(); count(doc, 12);
+  const target = all(doc)[11].dataset.component;
+  set(doc, 'component-search', 'no such candidate'); count(doc, 0);
+  frame.contentWindow.location.hash = target;
+  await new Promise(resolve => frame.contentWindow.addEventListener('hashchange', resolve, {once:true}));
+  count(doc, 12, 2);
+  check(doc.getElementById(target).open && !doc.getElementById(target).hidden, 'Deep link opens target page and evidence');
+  set(doc, 'component-search', 'no such candidate'); count(doc, 0);
+  doc.querySelector(`#components a[href="#${target}"]`).click(); count(doc, 12, 2);
+  frame.contentWindow.dispatchEvent(new Event('beforeprint'));
+  check(visible(doc).length === 12, 'Print includes later pages');
+  frame.contentWindow.dispatchEvent(new Event('afterprint')); count(doc, 12, 2);
+  page(doc, 'first'); count(doc, 12);
+  check(!doc.getElementById('evidence-hint').hidden, 'Changing page clears previous selection');
+  result.textContent = 'PASS — pagination, last page, page jumps, global sorting, filters, reset, empty results, precision, missing scores, single inspector, deep links and printing.';
+})().catch(error => { result.textContent = `FAIL — ${error.message}`; });
+</script></html>

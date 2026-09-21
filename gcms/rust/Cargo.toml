@@ -1,0 +1,17 @@
+[package]
+name = "gcms-rust"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+
+[lib]
+name = "_gcms_rust"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.29.2", features = ["extension-module"] }
+numpy = "0.29.0"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"

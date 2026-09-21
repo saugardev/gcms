@@ -1,0 +1,315 @@
+{
+  "benchmark_version": "1.0",
+  "engine": "python",
+  "workflow": "review",
+  "shared_python_work": "input loading/validation, filter coefficients, report construction and JSON; review also shares profile scheduling, stability classification and plot-trace preparation",
+  "input_mode": "raw_data_ms",
+  "repeats": 5,
+  "warmups": 1,
+  "environment": {
+    "python": "3.12.13 (main, Apr  7 2026, 21:09:58) [Clang 22.1.1 ]",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "logical_cpus": 10,
+    "numpy_build": {
+      "Compilers": {
+        "c": {
+          "name": "clang",
+          "linker": "ld64",
+          "version": "15.0.0",
+          "commands": "cc"
+        },
+        "cython": {
+          "name": "cython",
+          "linker": "cython",
+          "version": "3.3.0",
+          "commands": "cython"
+        },
+        "c++": {
+          "name": "clang",
+          "linker": "ld64",
+          "version": "15.0.0",
+          "commands": "c++"
+        }
+      },
+      "Machine Information": {
+        "host": {
+          "cpu": "aarch64",
+          "family": "aarch64",
+          "endian": "little",
+          "system": "darwin"
+        },
+        "build": {
+          "cpu": "aarch64",
+          "family": "aarch64",
+          "endian": "little",
+          "system": "darwin"
+        }
+      },
+      "Build Dependencies": {
+        "blas": {
+          "name": "accelerate",
+          "found": true,
+          "version": "unknown",
+          "detection method": "system",
+          "include directory": "unknown",
+          "lib directory": "unknown",
+          "openblas configuration": "unknown",
+          "pc file directory": "unknown"
+        },
+        "lapack": {
+          "name": "accelerate",
+          "found": true,
+          "version": "unknown",
+          "detection method": "system",
+          "include directory": "unknown",
+          "lib directory": "unknown",
+          "openblas configuration": "unknown",
+          "pc file directory": "unknown"
+        }
+      },
+      "Python Information": {
+        "path": "/private/var/folders/s6/5hzmn6lx4dz5nxs7k_0slzph0000gn/T/build-env-sd3oh5ko/bin/python",
+        "version": "3.12"
+      },
+      "SIMD Extensions": {
+        "baseline": [
+          "NEON",
+          "NEON_FP16",
+          "NEON_VFPV4",
+          "ASIMD"
+        ],
+        "found": [
+          "ASIMDHP",
+          "ASIMDDP"
+        ],
+        "not found": [
+          "ASIMDFHM"
+        ]
+      }
+    },
+    "thread_environment": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  },
+  "parameters": {
+    "smoothing_seconds": 0.8,
+    "baseline_seconds": 60.0,
+    "min_width_seconds": 0.6,
+    "max_width_seconds": 30.0,
+    "coapex_seconds": 0.5,
+    "noise_multiplier": 8.0,
+    "min_ions": 3,
+    "relative_ion_threshold": 0.01,
+    "min_component_fraction": 0.001,
+    "match_threshold": 0.75,
+    "ambiguity_margin": 0.03,
+    "top_k": 3
+  },
+  "provenance": {
+    "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+    "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+    "software": {
+      "mafer-gcms": "0.1.0",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "rainbow-api": "1.5.2"
+    },
+    "numeric_dtype": "float64",
+    "mass_binning": "nearest integer, ties to even, summed intensities"
+  },
+  "fresh_process_wall_seconds": {
+    "median": 6.610807083023246,
+    "min": 6.353795958973933,
+    "max": 7.3608988340129144
+  },
+  "fresh_process_peak_rss_bytes": {
+    "median": 696745984.0,
+    "min": 676085760,
+    "max": 788168704
+  },
+  "warm_analysis_seconds": {
+    "median": 5.598348249972332,
+    "min": 5.517701666976791,
+    "max": 6.838382707966957
+  },
+  "deterministic_report_hashes": true,
+  "fresh_runs": [
+    {
+      "timings": {
+        "input_seconds": 0.36714720801683143,
+        "baseline_seconds": 0.8128941250033677,
+        "variant_analysis_seconds": 5.052199999045115,
+        "correspondence_seconds": 0.03859704191563651,
+        "evidence_seconds": 0.04353429196635261,
+        "analysis_seconds": 5.949963665974792,
+        "json_seconds": 0.04401033301837742
+      },
+      "peak_rss_bytes": 677150720,
+      "report_sha256": "9f9020cef46ca583a687775cb15c5a138ca31c3f7d4463aaf156f54af53e5ced",
+      "component_count": 333,
+      "provenance": {
+        "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+        "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+        "software": {
+          "mafer-gcms": "0.1.0",
+          "numpy": "2.5.3",
+          "scipy": "1.18.1",
+          "rainbow-api": "1.5.2"
+        },
+        "numeric_dtype": "float64",
+        "mass_binning": "nearest integer, ties to even, summed intensities"
+      },
+      "process_wall_seconds": 7.114119916979689
+    },
+    {
+      "timings": {
+        "input_seconds": 0.3352008340298198,
+        "baseline_seconds": 0.7477913749753498,
+        "variant_analysis_seconds": 5.379075459903106,
+        "correspondence_seconds": 0.07820470706792548,
+        "evidence_seconds": 0.030720792012289166,
+        "analysis_seconds": 6.243943291949108,
+        "json_seconds": 0.035784290987066925
+      },
+      "peak_rss_bytes": 696745984,
+      "report_sha256": "9f9020cef46ca583a687775cb15c5a138ca31c3f7d4463aaf156f54af53e5ced",
+      "component_count": 333,
+      "provenance": {
+        "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+        "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+        "software": {
+          "mafer-gcms": "0.1.0",
+          "numpy": "2.5.3",
+          "scipy": "1.18.1",
+          "rainbow-api": "1.5.2"
+        },
+        "numeric_dtype": "float64",
+        "mass_binning": "nearest integer, ties to even, summed intensities"
+      },
+      "process_wall_seconds": 7.3608988340129144
+    },
+    {
+      "timings": {
+        "input_seconds": 0.3209828329854645,
+        "baseline_seconds": 0.7947927089990117,
+        "variant_analysis_seconds": 4.708756833977532,
+        "correspondence_seconds": 0.03211979102343321,
+        "evidence_seconds": 0.02151375001994893,
+        "analysis_seconds": 5.559568415977992,
+        "json_seconds": 0.02774070797022432
+      },
+      "peak_rss_bytes": 676085760,
+      "report_sha256": "9f9020cef46ca583a687775cb15c5a138ca31c3f7d4463aaf156f54af53e5ced",
+      "component_count": 333,
+      "provenance": {
+        "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+        "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+        "software": {
+          "mafer-gcms": "0.1.0",
+          "numpy": "2.5.3",
+          "scipy": "1.18.1",
+          "rainbow-api": "1.5.2"
+        },
+        "numeric_dtype": "float64",
+        "mass_binning": "nearest integer, ties to even, summed intensities"
+      },
+      "process_wall_seconds": 6.610807083023246
+    },
+    {
+      "timings": {
+        "input_seconds": 0.27257375000044703,
+        "baseline_seconds": 0.7928658750024624,
+        "variant_analysis_seconds": 4.545637998962775,
+        "correspondence_seconds": 0.03154954203637317,
+        "evidence_seconds": 0.023711959016509354,
+        "analysis_seconds": 5.396154500020202,
+        "json_seconds": 0.02698675001738593
+      },
+      "peak_rss_bytes": 785252352,
+      "report_sha256": "9f9020cef46ca583a687775cb15c5a138ca31c3f7d4463aaf156f54af53e5ced",
+      "component_count": 333,
+      "provenance": {
+        "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+        "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+        "software": {
+          "mafer-gcms": "0.1.0",
+          "numpy": "2.5.3",
+          "scipy": "1.18.1",
+          "rainbow-api": "1.5.2"
+        },
+        "numeric_dtype": "float64",
+        "mass_binning": "nearest integer, ties to even, summed intensities"
+      },
+      "process_wall_seconds": 6.378097958979197
+    },
+    {
+      "timings": {
+        "input_seconds": 0.2794922500033863,
+        "baseline_seconds": 0.7282845000154339,
+        "variant_analysis_seconds": 4.440616792067885,
+        "correspondence_seconds": 0.0331807499169372,
+        "evidence_seconds": 0.05123983300291002,
+        "analysis_seconds": 5.263536042009946,
+        "json_seconds": 0.09274375002132729
+      },
+      "peak_rss_bytes": 788168704,
+      "report_sha256": "9f9020cef46ca583a687775cb15c5a138ca31c3f7d4463aaf156f54af53e5ced",
+      "component_count": 333,
+      "provenance": {
+        "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+        "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+        "software": {
+          "mafer-gcms": "0.1.0",
+          "numpy": "2.5.3",
+          "scipy": "1.18.1",
+          "rainbow-api": "1.5.2"
+        },
+        "numeric_dtype": "float64",
+        "mass_binning": "nearest integer, ties to even, summed intensities"
+      },
+      "process_wall_seconds": 6.353795958973933
+    }
+  ],
+  "warm_runs": [
+    {
+      "baseline_seconds": 0.7129127920488827,
+      "variant_analysis_seconds": 4.762584041105583,
+      "correspondence_seconds": 0.03144900087499991,
+      "evidence_seconds": 0.08142079197568819,
+      "analysis_wall_seconds": 5.598348249972332
+    },
+    {
+      "baseline_seconds": 0.6942650000564754,
+      "variant_analysis_seconds": 4.992943999066483,
+      "correspondence_seconds": 0.03659170994069427,
+      "evidence_seconds": 0.037106749950908124,
+      "analysis_wall_seconds": 5.768180290993769
+    },
+    {
+      "baseline_seconds": 0.7124245830345899,
+      "variant_analysis_seconds": 4.736888706916943,
+      "correspondence_seconds": 0.03468704305123538,
+      "evidence_seconds": 0.026512834010645747,
+      "analysis_wall_seconds": 5.517701666976791
+    },
+    {
+      "baseline_seconds": 0.6836072910227813,
+      "variant_analysis_seconds": 4.820640665071551,
+      "correspondence_seconds": 0.039661084942054003,
+      "evidence_seconds": 0.02188495802693069,
+      "analysis_wall_seconds": 5.573129708005581
+    },
+    {
+      "baseline_seconds": 0.9113408749690279,
+      "variant_analysis_seconds": 5.837360621953849,
+      "correspondence_seconds": 0.048429211077746004,
+      "evidence_seconds": 0.03391779202502221,
+      "analysis_wall_seconds": 6.838382707966957
+    }
+  ],
+  "scope": "Fresh: interpreter/imports + input validation/read + analysis + JSON serialization. Warm: validated decoded arrays + processing/report model. No HTTP, HTML or report disk write. For workflow=review, analysis means all seven analyses, correspondence and local evidence. Disk caches are not flushed. RSS includes interpreter and native libraries."
+}

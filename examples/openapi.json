@@ -1,0 +1,1397 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Mafer GC-MS screening API",
+    "description": "Upload a ZIP containing one complete ChemStation .D/data.ms. Results are screening candidates, not confirmed identities. Times are seconds.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/v1/sample": {
+      "get": {
+        "summary": "Analyze the optional GCMS_SAMPLE acquisition using the configured library",
+        "operationId": "sample_dashboard_v1_sample_get",
+        "parameters": [
+          {
+            "name": "smoothing_seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 5,
+              "minimum": 0,
+              "default": 0.8,
+              "title": "Smoothing Seconds"
+            }
+          },
+          {
+            "name": "baseline_seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 300,
+              "minimum": 10,
+              "default": 60,
+              "title": "Baseline Seconds"
+            }
+          },
+          {
+            "name": "min_width_seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 10,
+              "minimum": 0.1,
+              "default": 0.6,
+              "title": "Min Width Seconds"
+            }
+          },
+          {
+            "name": "max_width_seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 120,
+              "minimum": 1,
+              "default": 30,
+              "title": "Max Width Seconds"
+            }
+          },
+          {
+            "name": "coapex_seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 2,
+              "minimum": 0,
+              "default": 0.5,
+              "title": "Coapex Seconds"
+            }
+          },
+          {
+            "name": "noise_multiplier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 50,
+              "minimum": 3,
+              "default": 8,
+              "title": "Noise Multiplier"
+            }
+          },
+          {
+            "name": "min_ions",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10,
+              "minimum": 2,
+              "default": 3,
+              "title": "Min Ions"
+            }
+          },
+          {
+            "name": "relative_ion_threshold",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 0.2,
+              "minimum": 0,
+              "default": 0.01,
+              "title": "Relative Ion Threshold"
+            }
+          },
+          {
+            "name": "min_component_fraction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 0.1,
+              "minimum": 0,
+              "default": 0.001,
+              "title": "Min Component Fraction"
+            }
+          },
+          {
+            "name": "match_threshold",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 1,
+              "minimum": 0,
+              "default": 0.75,
+              "title": "Match Threshold"
+            }
+          },
+          {
+            "name": "ambiguity_margin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 0.2,
+              "minimum": 0,
+              "default": 0.03,
+              "title": "Ambiguity Margin"
+            }
+          },
+          {
+            "name": "top_k",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10,
+              "minimum": 1,
+              "default": 3,
+              "title": "Top K"
+            }
+          },
+          {
+            "name": "output",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "json",
+                "html"
+              ],
+              "type": "string",
+              "default": "json",
+              "title": "Output"
+            }
+          },
+          {
+            "name": "engine",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "python",
+                "rust"
+              ],
+              "type": "string",
+              "default": "python",
+              "title": "Engine"
+            }
+          },
+          {
+            "name": "review",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Review"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/AnalysisReport"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ReviewReport"
+                    }
+                  ],
+                  "title": "Response Sample Dashboard V1 Sample Get"
+                }
+              },
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Another request is active; retry later"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/library": {
+      "get": {
+        "summary": "Library Info",
+        "operationId": "library_info_v1_library_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/analyze": {
+      "post": {
+        "summary": "Analyze Upload",
+        "operationId": "analyze_upload_v1_analyze_post",
+        "parameters": [
+          {
+            "name": "smoothing_seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 5,
+              "minimum": 0,
+              "default": 0.8,
+              "title": "Smoothing Seconds"
+            }
+          },
+          {
+            "name": "baseline_seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 300,
+              "minimum": 10,
+              "default": 60,
+              "title": "Baseline Seconds"
+            }
+          },
+          {
+            "name": "min_width_seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 10,
+              "minimum": 0.1,
+              "default": 0.6,
+              "title": "Min Width Seconds"
+            }
+          },
+          {
+            "name": "max_width_seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 120,
+              "minimum": 1,
+              "default": 30,
+              "title": "Max Width Seconds"
+            }
+          },
+          {
+            "name": "coapex_seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 2,
+              "minimum": 0,
+              "default": 0.5,
+              "title": "Coapex Seconds"
+            }
+          },
+          {
+            "name": "noise_multiplier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 50,
+              "minimum": 3,
+              "default": 8,
+              "title": "Noise Multiplier"
+            }
+          },
+          {
+            "name": "min_ions",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10,
+              "minimum": 2,
+              "default": 3,
+              "title": "Min Ions"
+            }
+          },
+          {
+            "name": "relative_ion_threshold",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 0.2,
+              "minimum": 0,
+              "default": 0.01,
+              "title": "Relative Ion Threshold"
+            }
+          },
+          {
+            "name": "min_component_fraction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 0.1,
+              "minimum": 0,
+              "default": 0.001,
+              "title": "Min Component Fraction"
+            }
+          },
+          {
+            "name": "match_threshold",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 1,
+              "minimum": 0,
+              "default": 0.75,
+              "title": "Match Threshold"
+            }
+          },
+          {
+            "name": "ambiguity_margin",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 0.2,
+              "minimum": 0,
+              "default": 0.03,
+              "title": "Ambiguity Margin"
+            }
+          },
+          {
+            "name": "top_k",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10,
+              "minimum": 1,
+              "default": 3,
+              "title": "Top K"
+            }
+          },
+          {
+            "name": "output",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "json",
+                "html"
+              ],
+              "type": "string",
+              "default": "json",
+              "title": "Output"
+            }
+          },
+          {
+            "name": "engine",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "python",
+                "rust"
+              ],
+              "type": "string",
+              "default": "python",
+              "title": "Engine"
+            }
+          },
+          {
+            "name": "review",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Review"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/AnalysisReport"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ReviewReport"
+                    }
+                  ],
+                  "title": "Response Analyze Upload V1 Analyze Post"
+                }
+              },
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Upload did not complete within 60 seconds"
+          },
+          "413": {
+            "description": "Upload or expanded data exceeds documented limits"
+          },
+          "415": {
+            "description": "Use Content-Type: application/zip"
+          },
+          "422": {
+            "description": "Invalid ZIP, acquisition format or processing parameters"
+          },
+          "503": {
+            "description": "Another request is active; retry later"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/zip": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AnalysisReport": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "title": "Schema Version",
+            "default": "1.0"
+          },
+          "algorithm_version": {
+            "type": "string",
+            "title": "Algorithm Version",
+            "default": "coapex-1"
+          },
+          "sample_name": {
+            "type": "string",
+            "title": "Sample Name"
+          },
+          "provenance": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Provenance"
+          },
+          "acquisition": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Acquisition"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/Parameters"
+          },
+          "library": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Library"
+          },
+          "summary": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Summary"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "chromatogram": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Chromatogram"
+          },
+          "components": {
+            "items": {
+              "$ref": "#/components/schemas/Component"
+            },
+            "type": "array",
+            "title": "Components"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sample_name",
+          "provenance",
+          "acquisition",
+          "parameters",
+          "library",
+          "summary",
+          "warnings",
+          "chromatogram",
+          "components"
+        ],
+        "title": "AnalysisReport"
+      },
+      "Candidate": {
+        "properties": {
+          "group_id": {
+            "type": "string",
+            "title": "Group Id"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score"
+          },
+          "identities": {
+            "items": {
+              "$ref": "#/components/schemas/Identity"
+            },
+            "type": "array",
+            "title": "Identities"
+          },
+          "library_intensity_fraction_in_mass_range": {
+            "type": "number",
+            "title": "Library Intensity Fraction In Mass Range"
+          },
+          "reference_spectrum": {
+            "$ref": "#/components/schemas/Spectrum"
+          }
+        },
+        "type": "object",
+        "required": [
+          "group_id",
+          "score",
+          "identities",
+          "library_intensity_fraction_in_mass_range",
+          "reference_spectrum"
+        ],
+        "title": "Candidate"
+      },
+      "Component": {
+        "properties": {
+          "component_id": {
+            "type": "string",
+            "title": "Component Id"
+          },
+          "apex_scan": {
+            "type": "integer",
+            "title": "Apex Scan"
+          },
+          "start_seconds": {
+            "type": "number",
+            "title": "Start Seconds"
+          },
+          "apex_seconds": {
+            "type": "number",
+            "title": "Apex Seconds"
+          },
+          "end_seconds": {
+            "type": "number",
+            "title": "End Seconds"
+          },
+          "area": {
+            "type": "number",
+            "title": "Area"
+          },
+          "area_percent": {
+            "type": "number",
+            "title": "Area Percent"
+          },
+          "apexing_ion_count": {
+            "type": "integer",
+            "title": "Apexing Ion Count"
+          },
+          "spectrum": {
+            "$ref": "#/components/schemas/Spectrum"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "tentative",
+              "ambiguous",
+              "unassigned"
+            ],
+            "title": "Status"
+          },
+          "score_margin": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score Margin"
+          },
+          "close_candidate_groups": {
+            "type": "integer",
+            "title": "Close Candidate Groups"
+          },
+          "spectral_change": {
+            "type": "number",
+            "title": "Spectral Change"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "type": "array",
+            "title": "Candidates"
+          }
+        },
+        "type": "object",
+        "required": [
+          "component_id",
+          "apex_scan",
+          "start_seconds",
+          "apex_seconds",
+          "end_seconds",
+          "area",
+          "area_percent",
+          "apexing_ion_count",
+          "spectrum",
+          "status",
+          "score_margin",
+          "close_candidate_groups",
+          "spectral_change",
+          "warnings",
+          "candidates"
+        ],
+        "title": "Component"
+      },
+      "ComponentReview": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "enum": [
+              "consistent",
+              "sensitive",
+              "inconclusive"
+            ],
+            "title": "Label"
+          },
+          "evaluated_profiles": {
+            "type": "integer",
+            "title": "Evaluated Profiles"
+          },
+          "matched_profiles": {
+            "type": "integer",
+            "title": "Matched Profiles"
+          },
+          "same_top_group_profiles": {
+            "type": "integer",
+            "title": "Same Top Group Profiles"
+          },
+          "match_fraction": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match Fraction"
+          },
+          "max_apex_shift_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Apex Shift Seconds"
+          },
+          "min_area_ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Area Ratio"
+          },
+          "max_area_ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Area Ratio"
+          },
+          "observations": {
+            "items": {
+              "$ref": "#/components/schemas/ProfileObservation"
+            },
+            "type": "array",
+            "title": "Observations"
+          },
+          "trace": {
+            "$ref": "#/components/schemas/PeakTrace"
+          },
+          "selection_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Selection Reasons"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "evaluated_profiles",
+          "matched_profiles",
+          "same_top_group_profiles",
+          "match_fraction",
+          "max_apex_shift_seconds",
+          "min_area_ratio",
+          "max_area_ratio",
+          "observations",
+          "trace"
+        ],
+        "title": "ComponentReview"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Identity": {
+        "properties": {
+          "entry_id": {
+            "type": "string",
+            "title": "Entry Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "cas": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cas"
+          },
+          "formula": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Formula"
+          },
+          "molecular_weight": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Molecular Weight"
+          },
+          "reference_rt": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Rt"
+          },
+          "reference_ri": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Ri"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entry_id",
+          "name"
+        ],
+        "title": "Identity"
+      },
+      "IonTrace": {
+        "properties": {
+          "mz": {
+            "type": "number",
+            "title": "Mz"
+          },
+          "intensity": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Intensity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mz",
+          "intensity"
+        ],
+        "title": "IonTrace"
+      },
+      "Parameters": {
+        "properties": {
+          "smoothing_seconds": {
+            "type": "number",
+            "maximum": 5.0,
+            "minimum": 0.0,
+            "title": "Smoothing Seconds",
+            "default": 0.8
+          },
+          "baseline_seconds": {
+            "type": "number",
+            "maximum": 300.0,
+            "minimum": 10.0,
+            "title": "Baseline Seconds",
+            "default": 60
+          },
+          "min_width_seconds": {
+            "type": "number",
+            "maximum": 10.0,
+            "minimum": 0.1,
+            "title": "Min Width Seconds",
+            "default": 0.6
+          },
+          "max_width_seconds": {
+            "type": "number",
+            "maximum": 120.0,
+            "minimum": 1.0,
+            "title": "Max Width Seconds",
+            "default": 30
+          },
+          "coapex_seconds": {
+            "type": "number",
+            "maximum": 2.0,
+            "minimum": 0.0,
+            "title": "Coapex Seconds",
+            "default": 0.5
+          },
+          "noise_multiplier": {
+            "type": "number",
+            "maximum": 50.0,
+            "minimum": 3.0,
+            "title": "Noise Multiplier",
+            "default": 8
+          },
+          "min_ions": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 2.0,
+            "title": "Min Ions",
+            "default": 3
+          },
+          "relative_ion_threshold": {
+            "type": "number",
+            "maximum": 0.2,
+            "minimum": 0.0,
+            "title": "Relative Ion Threshold",
+            "default": 0.01
+          },
+          "min_component_fraction": {
+            "type": "number",
+            "maximum": 0.1,
+            "minimum": 0.0,
+            "title": "Min Component Fraction",
+            "default": 0.001
+          },
+          "match_threshold": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Match Threshold",
+            "default": 0.75
+          },
+          "ambiguity_margin": {
+            "type": "number",
+            "maximum": 0.2,
+            "minimum": 0.0,
+            "title": "Ambiguity Margin",
+            "default": 0.03
+          },
+          "top_k": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Top K",
+            "default": 3
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Parameters"
+      },
+      "PeakTrace": {
+        "properties": {
+          "time_seconds": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Time Seconds"
+          },
+          "raw_tic": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Raw Tic"
+          },
+          "corrected_tic": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Corrected Tic"
+          },
+          "component_ion_sum": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Component Ion Sum"
+          },
+          "ions": {
+            "items": {
+              "$ref": "#/components/schemas/IonTrace"
+            },
+            "type": "array",
+            "title": "Ions"
+          },
+          "preview": {
+            "type": "boolean",
+            "title": "Preview"
+          },
+          "full_window_scan_count": {
+            "type": "integer",
+            "title": "Full Window Scan Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "time_seconds",
+          "raw_tic",
+          "corrected_tic",
+          "component_ion_sum",
+          "ions",
+          "preview",
+          "full_window_scan_count"
+        ],
+        "title": "PeakTrace"
+      },
+      "ProfileObservation": {
+        "properties": {
+          "profile": {
+            "type": "string",
+            "title": "Profile"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "matched",
+              "not_matched",
+              "ambiguous",
+              "not_evaluated"
+            ],
+            "title": "Outcome"
+          },
+          "eligible_components": {
+            "type": "integer",
+            "title": "Eligible Components",
+            "default": 0
+          },
+          "component_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Component Id"
+          },
+          "apex_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Apex Seconds"
+          },
+          "spectral_similarity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Spectral Similarity"
+          },
+          "top_group_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top Group Id"
+          },
+          "top_names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Top Names"
+          },
+          "same_top_group": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Same Top Group"
+          },
+          "identification_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Identification Status"
+          },
+          "area": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile",
+          "outcome"
+        ],
+        "title": "ProfileObservation"
+      },
+      "ReviewReport": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "title": "Schema Version",
+            "default": "review-1.0"
+          },
+          "analysis": {
+            "$ref": "#/components/schemas/AnalysisReport"
+          },
+          "method": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Method"
+          },
+          "variants": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewVariant"
+            },
+            "type": "array",
+            "title": "Variants"
+          },
+          "annotations": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ComponentReview"
+            },
+            "type": "object",
+            "title": "Annotations"
+          },
+          "review_packet": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Review Packet"
+          },
+          "summary": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Summary"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          }
+        },
+        "type": "object",
+        "required": [
+          "analysis",
+          "method",
+          "variants",
+          "annotations",
+          "review_packet",
+          "summary",
+          "warnings"
+        ],
+        "title": "ReviewReport"
+      },
+      "ReviewVariant": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "parameters": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Parameters"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "skipped",
+              "failed"
+            ],
+            "title": "State"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "component_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Component Count"
+          },
+          "statuses": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Statuses"
+          },
+          "unmatched_variant_components": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unmatched Variant Components"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "parameters",
+          "state"
+        ],
+        "title": "ReviewVariant"
+      },
+      "Spectrum": {
+        "properties": {
+          "mz": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Mz"
+          },
+          "intensity": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Intensity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mz",
+          "intensity"
+        ],
+        "title": "Spectrum"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

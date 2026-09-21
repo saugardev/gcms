@@ -1,0 +1,118 @@
+{
+  "scope": "Rust numerical kernels versus NumPy/SciPy; both retain Python I/O, input validation, filter coefficient generation, report construction and JSON. Single numerical thread, release Rust build.",
+  "measurement_files": {
+    "python": "examples/python-comparison-benchmark.json",
+    "rust": "examples/rust-benchmark.json"
+  },
+  "results": {
+    "python": {
+      "repeats": 7,
+      "fresh_process_wall_seconds": {
+        "median": 1.7901035000104457,
+        "min": 1.74043674999848,
+        "max": 2.17159395897761
+      },
+      "warm_analysis_seconds": {
+        "median": 0.678320209030062,
+        "min": 0.6583052080241032,
+        "max": 0.750442458956968
+      },
+      "fresh_process_peak_rss_bytes": {
+        "median": 642400256.0,
+        "min": 530464768,
+        "max": 686292992
+      },
+      "deterministic_report_hashes": true,
+      "warm_stage_medians_seconds": {
+        "preprocess_seconds": 0.19953737501055002,
+        "detect_extract_seconds": 0.4017185000120662,
+        "project_match_seconds": 0.006361750012729317,
+        "report_seconds": 0.04921470896806568,
+        "analysis_wall_seconds": 0.678320209030062
+      }
+    },
+    "rust": {
+      "repeats": 7,
+      "fresh_process_wall_seconds": {
+        "median": 1.5198433329933323,
+        "min": 1.427221207995899,
+        "max": 1.6188740420038812
+      },
+      "warm_analysis_seconds": {
+        "median": 0.4382134579936974,
+        "min": 0.43538854201324284,
+        "max": 0.4581877500168048
+      },
+      "fresh_process_peak_rss_bytes": {
+        "median": 513097728.0,
+        "min": 471744512,
+        "max": 541327360
+      },
+      "deterministic_report_hashes": true,
+      "warm_stage_medians_seconds": {
+        "preprocess_seconds": 0.11371745803626254,
+        "detect_extract_seconds": 0.22624666604679078,
+        "project_match_seconds": 0.04184137500124052,
+        "report_seconds": 0.0491302500013262,
+        "analysis_wall_seconds": 0.4382134579936974
+      }
+    }
+  },
+  "speedup_python_over_rust": {
+    "warm_analysis_seconds": 1.547921901202354,
+    "fresh_process_wall_seconds": 1.177821069547238
+  },
+  "equivalence_to_original": {
+    "python": {
+      "equivalent": true,
+      "differences": []
+    },
+    "rust": {
+      "equivalent": true,
+      "differences": []
+    }
+  },
+  "parameters": {
+    "smoothing_seconds": 0.8,
+    "baseline_seconds": 60.0,
+    "min_width_seconds": 0.6,
+    "max_width_seconds": 30.0,
+    "coapex_seconds": 0.5,
+    "noise_multiplier": 8.0,
+    "min_ions": 3,
+    "relative_ion_threshold": 0.01,
+    "min_component_fraction": 0.001,
+    "match_threshold": 0.75,
+    "ambiguity_margin": 0.03,
+    "top_k": 3
+  },
+  "input_provenance": {
+    "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+    "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+    "software": {
+      "mafer-gcms": "0.1.0",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "rainbow-api": "1.5.2"
+    },
+    "numeric_dtype": "float64",
+    "mass_binning": "nearest integer, ties to even, summed intensities"
+  },
+  "rust_build": {
+    "rustc": "rustc 1.94.0 (4a4ef493e 2026-03-02)",
+    "cargo": "cargo 1.94.0 (85eff7c80 2026-01-15)",
+    "profile": "release, thin LTO, 1 codegen unit",
+    "rustflags": null,
+    "binary_sha256": "3dd79bd4cf5217d2140f1b5698fbe64b0b17ad8c11f8a6f5ae789996a7bd07ce"
+  },
+  "source_sha256": {
+    "rust/Cargo.toml": "ee94edf1d8cecdc9245ead18a1d14b1eedc4245522c0a2357b7686391ba2811d",
+    "rust/Cargo.lock": "29fe1626ef2b7642e6be32588fa97186726b430e9ba14b630fc8f4a1835185ea",
+    "rust/build.rs": "8a9a6c559a8971ecb657905ac0a49b1d2de94b008c193e2192a0fe978be2cb41",
+    "rust/src/lib.rs": "50503903c555930a2c11c34180473b1cdc133d6d439cfe6bd3880814bf747069",
+    "gcms/rust_backend.py": "4b21d0bf1c20b0c2437372288c32d154beedf04ee99d396d03cbcfa39577a7d9",
+    "gcms/pipeline.py": "17d0cea983e2f098b46582c718d4d37688013f9e0ee4d9e0355fa72e39950f16",
+    "gcms/benchmark.py": "88213ff9a6233764ed51f1158a37e8f7ce01d6cf1aa2051045cc1d9f4b436c5a",
+    "gcms/models.py": "7475d1bd1328b1e2870aa6c73c86887bd4ff4dc492674c6b5f4eafe1f7a7e3b2"
+  }
+}

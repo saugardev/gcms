@@ -1,0 +1,144 @@
+{
+  "workflow": "review",
+  "method": {
+    "version": "stability-1",
+    "time_tolerance_seconds": 0.75,
+    "minimum_spectral_similarity": 0.8,
+    "planned_alternative_profiles": 6,
+    "matching": "Reciprocally unique RT/spectrum-compatible components; competing matches remain ambiguous.",
+    "denominator": "Completed alternative profiles, excluding baseline. Ambiguous correspondence is not a confirmed match.",
+    "consistent": "All six alternative profiles complete, uniquely match, and retain the same nonempty top reference group."
+  },
+  "measurement_files": {
+    "python": "examples/python-review-benchmark.json",
+    "rust": "examples/rust-review-benchmark.json"
+  },
+  "scope": "Fresh: interpreter/imports + input validation/read + analysis + JSON serialization. Warm: validated decoded arrays + processing/report model. No HTTP, HTML or report disk write. For workflow=review, analysis means all seven analyses, correspondence and local evidence. Disk caches are not flushed. RSS includes interpreter and native libraries.",
+  "shared_python_work": "input loading/validation, filter coefficients, report construction and JSON; review also shares profile scheduling, stability classification and plot-trace preparation",
+  "results": {
+    "python": {
+      "repeats": 5,
+      "warm_analysis_seconds": {
+        "median": 5.598348249972332,
+        "min": 5.517701666976791,
+        "max": 6.838382707966957
+      },
+      "fresh_process_wall_seconds": {
+        "median": 6.610807083023246,
+        "min": 6.353795958973933,
+        "max": 7.3608988340129144
+      },
+      "fresh_process_peak_rss_bytes": {
+        "median": 696745984.0,
+        "min": 676085760,
+        "max": 788168704
+      },
+      "deterministic_report_hashes": true,
+      "warm_stage_medians_seconds": {
+        "baseline_seconds": 0.7124245830345899,
+        "variant_analysis_seconds": 4.820640665071551,
+        "correspondence_seconds": 0.03659170994069427,
+        "evidence_seconds": 0.03391779202502221,
+        "analysis_wall_seconds": 5.598348249972332
+      }
+    },
+    "rust": {
+      "repeats": 5,
+      "warm_analysis_seconds": {
+        "median": 3.3736907910206355,
+        "min": 3.310777375008911,
+        "max": 3.5732370410114527
+      },
+      "fresh_process_wall_seconds": {
+        "median": 4.54491766699357,
+        "min": 4.453398708021268,
+        "max": 4.833813958975952
+      },
+      "fresh_process_peak_rss_bytes": {
+        "median": 577159168.0,
+        "min": 543588352,
+        "max": 611205120
+      },
+      "deterministic_report_hashes": true,
+      "warm_stage_medians_seconds": {
+        "baseline_seconds": 0.4454618340241723,
+        "variant_analysis_seconds": 2.8576792500680313,
+        "correspondence_seconds": 0.026765124988742173,
+        "evidence_seconds": 0.0245119160390459,
+        "analysis_wall_seconds": 3.3736907910206355
+      }
+    }
+  },
+  "speedup_python_over_rust": {
+    "warm_analysis_seconds": 1.6594135612169354,
+    "fresh_process_wall_seconds": 1.4545493598338928
+  },
+  "review_summary": {
+    "labels": {
+      "sensitive": 288,
+      "consistent": 45
+    },
+    "completed_alternative_profiles": 6,
+    "selected_for_review": 12
+  },
+  "profile_counts": {
+    "baseline": 333,
+    "permissive": 800,
+    "conservative": 174,
+    "less_smoothing": 370,
+    "more_smoothing": 280,
+    "narrow_grouping": 367,
+    "wide_grouping": 307
+  },
+  "complete_review_equivalence": {
+    "equivalent": true,
+    "differences": []
+  },
+  "baseline_equivalence_to_original": {
+    "equivalent": true,
+    "differences": []
+  },
+  "report_file_sha256": {
+    "python": "129f391598f2d54c29a15d915918801f9db38c79abb08c72df58e0275cc3f008",
+    "rust": "b0999cfc99a3c9f258466505bb6e18d4b0ac87c2044370b08060b246540dfc89"
+  },
+  "input_provenance": {
+    "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+    "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+    "software": {
+      "mafer-gcms": "0.1.0",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "rainbow-api": "1.5.2"
+    },
+    "numeric_dtype": "float64",
+    "mass_binning": "nearest integer, ties to even, summed intensities"
+  },
+  "rust_build": {
+    "rustc": "rustc 1.94.0 (4a4ef493e 2026-03-02)",
+    "cargo": "cargo 1.94.0 (85eff7c80 2026-01-15)",
+    "profile": "release, thin LTO, 1 codegen unit",
+    "rustflags": null,
+    "binary_sha256": "ebb521d761feb5e368c6bb4d28b70f3dc635fc2259599a1341f66ba5c214d3e5"
+  },
+  "source_sha256": {
+    "gcms/__init__.py": "f2db215d156a778e50a54db6a23028144cb0b0dc41411f6d8d3b0e4e4de8f435",
+    "gcms/api.py": "be310478090f846b1fa39e7ccc0d254dcbddaed82e19f87bef3528f60dca4342",
+    "gcms/benchmark.py": "bbff7ddeec9bfed794937abaf1ac88e52d0c465380cc16f2c0d01d8ff90e6c69",
+    "gcms/cli.py": "bb33bed080193663dc62612670e72ac507424a16dd68167a6e2b506cedf2f6c6",
+    "gcms/evaluation.py": "752c572183225019395a6fd36bef4c0de004063971e5be026a97802af7aea363",
+    "gcms/io.py": "aae9e2485dbe6a3f6a71957093c97ca7c4a5fc3d0ab447239d5d89b805b8233b",
+    "gcms/models.py": "2000afaa0b59d3ea2bc4553e3af72cbada55d2b8c3a79b177675f693cb7a29aa",
+    "gcms/pipeline.py": "17d0cea983e2f098b46582c718d4d37688013f9e0ee4d9e0355fa72e39950f16",
+    "gcms/report.py": "65796e57851aff2bb44f2d4c723b59721a77a708e58789e7647d2960700058d2",
+    "gcms/review.py": "970801091e23b8597263fb268e846a1cd35f5cb7b73e39ec11abd4af4172652b",
+    "gcms/rust_backend.py": "4b21d0bf1c20b0c2437372288c32d154beedf04ee99d396d03cbcfa39577a7d9",
+    "rust/src/lib.rs": "dbe1d5b397e82976bae5cddbe74f1449fa4a1930f48cfc1c94bd7c08e326dcc1",
+    "rust/Cargo.toml": "ee94edf1d8cecdc9245ead18a1d14b1eedc4245522c0a2357b7686391ba2811d",
+    "rust/Cargo.lock": "29fe1626ef2b7642e6be32588fa97186726b430e9ba14b630fc8f4a1835185ea",
+    "rust/build.rs": "8a9a6c559a8971ecb657905ac0a49b1d2de94b008c193e2192a0fe978be2cb41",
+    "uv.lock": "4835e3813a33f1de07452e81b26c325b705fe6e17b53d31648b114e99fa7d1a8"
+  },
+  "conditions": "Sequential engines on the same macOS arm64 machine, one numerical thread, OS caches retained. Background workloads and power settings were not controlled.",
+  "verification": "28 unittest checks passed with the Rust extension built; Ruff and cargo clippy passed; real ZIP HTTP Rust review JSON/HTML matched CLI output; full and packet HTML visually checked in Chrome."
+}

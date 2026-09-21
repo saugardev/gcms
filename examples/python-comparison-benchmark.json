@@ -1,0 +1,382 @@
+{
+  "benchmark_version": "1.0",
+  "engine": "python",
+  "shared_python_work": "input loading/validation, filter coefficients, report construction and JSON",
+  "input_mode": "raw_data_ms",
+  "repeats": 7,
+  "warmups": 1,
+  "environment": {
+    "python": "3.12.13 (main, Apr  7 2026, 21:09:58) [Clang 22.1.1 ]",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "logical_cpus": 10,
+    "numpy_build": {
+      "Compilers": {
+        "c": {
+          "name": "clang",
+          "linker": "ld64",
+          "version": "15.0.0",
+          "commands": "cc"
+        },
+        "cython": {
+          "name": "cython",
+          "linker": "cython",
+          "version": "3.3.0",
+          "commands": "cython"
+        },
+        "c++": {
+          "name": "clang",
+          "linker": "ld64",
+          "version": "15.0.0",
+          "commands": "c++"
+        }
+      },
+      "Machine Information": {
+        "host": {
+          "cpu": "aarch64",
+          "family": "aarch64",
+          "endian": "little",
+          "system": "darwin"
+        },
+        "build": {
+          "cpu": "aarch64",
+          "family": "aarch64",
+          "endian": "little",
+          "system": "darwin"
+        }
+      },
+      "Build Dependencies": {
+        "blas": {
+          "name": "accelerate",
+          "found": true,
+          "version": "unknown",
+          "detection method": "system",
+          "include directory": "unknown",
+          "lib directory": "unknown",
+          "openblas configuration": "unknown",
+          "pc file directory": "unknown"
+        },
+        "lapack": {
+          "name": "accelerate",
+          "found": true,
+          "version": "unknown",
+          "detection method": "system",
+          "include directory": "unknown",
+          "lib directory": "unknown",
+          "openblas configuration": "unknown",
+          "pc file directory": "unknown"
+        }
+      },
+      "Python Information": {
+        "path": "/private/var/folders/s6/5hzmn6lx4dz5nxs7k_0slzph0000gn/T/build-env-sd3oh5ko/bin/python",
+        "version": "3.12"
+      },
+      "SIMD Extensions": {
+        "baseline": [
+          "NEON",
+          "NEON_FP16",
+          "NEON_VFPV4",
+          "ASIMD"
+        ],
+        "found": [
+          "ASIMDHP",
+          "ASIMDDP"
+        ],
+        "not found": [
+          "ASIMDFHM"
+        ]
+      }
+    },
+    "thread_environment": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    }
+  },
+  "parameters": {
+    "smoothing_seconds": 0.8,
+    "baseline_seconds": 60.0,
+    "min_width_seconds": 0.6,
+    "max_width_seconds": 30.0,
+    "coapex_seconds": 0.5,
+    "noise_multiplier": 8.0,
+    "min_ions": 3,
+    "relative_ion_threshold": 0.01,
+    "min_component_fraction": 0.001,
+    "match_threshold": 0.75,
+    "ambiguity_margin": 0.03,
+    "top_k": 3
+  },
+  "provenance": {
+    "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+    "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+    "software": {
+      "mafer-gcms": "0.1.0",
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "rainbow-api": "1.5.2"
+    },
+    "numeric_dtype": "float64",
+    "mass_binning": "nearest integer, ties to even, summed intensities"
+  },
+  "fresh_process_wall_seconds": {
+    "median": 1.7901035000104457,
+    "min": 1.74043674999848,
+    "max": 2.17159395897761
+  },
+  "fresh_process_peak_rss_bytes": {
+    "median": 642400256.0,
+    "min": 530464768,
+    "max": 686292992
+  },
+  "warm_analysis_seconds": {
+    "median": 0.678320209030062,
+    "min": 0.6583052080241032,
+    "max": 0.750442458956968
+  },
+  "deterministic_report_hashes": true,
+  "fresh_runs": [
+    {
+      "timings": {
+        "input_seconds": 0.3661146250087768,
+        "preprocess_seconds": 0.2919744999962859,
+        "detect_extract_seconds": 0.6796747079933994,
+        "project_match_seconds": 0.008242917014285922,
+        "report_seconds": 0.07913512497907504,
+        "analysis_seconds": 1.0640579169848934,
+        "json_seconds": 0.015221000008750707
+      },
+      "peak_rss_bytes": 646692864,
+      "report_sha256": "d6f5b7cd546cc07d9715cc13e65da2008fe5fe3107fd14a6d8f68cebfe886240",
+      "component_count": 333,
+      "provenance": {
+        "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+        "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+        "software": {
+          "mafer-gcms": "0.1.0",
+          "numpy": "2.5.3",
+          "scipy": "1.18.1",
+          "rainbow-api": "1.5.2"
+        },
+        "numeric_dtype": "float64",
+        "mass_binning": "nearest integer, ties to even, summed intensities"
+      },
+      "process_wall_seconds": 2.17159395897761
+    },
+    {
+      "timings": {
+        "input_seconds": 0.45949666597880423,
+        "preprocess_seconds": 0.28181154100457206,
+        "detect_extract_seconds": 0.4392083749989979,
+        "project_match_seconds": 0.00776424998184666,
+        "report_seconds": 0.06386070803273469,
+        "analysis_seconds": 0.7982478329795413,
+        "json_seconds": 0.011866000015288591
+      },
+      "peak_rss_bytes": 598556672,
+      "report_sha256": "d6f5b7cd546cc07d9715cc13e65da2008fe5fe3107fd14a6d8f68cebfe886240",
+      "component_count": 333,
+      "provenance": {
+        "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+        "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+        "software": {
+          "mafer-gcms": "0.1.0",
+          "numpy": "2.5.3",
+          "scipy": "1.18.1",
+          "rainbow-api": "1.5.2"
+        },
+        "numeric_dtype": "float64",
+        "mass_binning": "nearest integer, ties to even, summed intensities"
+      },
+      "process_wall_seconds": 2.0269923750311136
+    },
+    {
+      "timings": {
+        "input_seconds": 0.35381566698197275,
+        "preprocess_seconds": 0.2614899589680135,
+        "detect_extract_seconds": 0.4379460830241442,
+        "project_match_seconds": 0.009373000008054078,
+        "report_seconds": 0.06536445900565013,
+        "analysis_seconds": 0.7806899170391262,
+        "json_seconds": 0.010398457990959287
+      },
+      "peak_rss_bytes": 530464768,
+      "report_sha256": "d6f5b7cd546cc07d9715cc13e65da2008fe5fe3107fd14a6d8f68cebfe886240",
+      "component_count": 333,
+      "provenance": {
+        "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+        "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+        "software": {
+          "mafer-gcms": "0.1.0",
+          "numpy": "2.5.3",
+          "scipy": "1.18.1",
+          "rainbow-api": "1.5.2"
+        },
+        "numeric_dtype": "float64",
+        "mass_binning": "nearest integer, ties to even, summed intensities"
+      },
+      "process_wall_seconds": 1.8604302919702604
+    },
+    {
+      "timings": {
+        "input_seconds": 0.33281654096208513,
+        "preprocess_seconds": 0.25942420796491206,
+        "detect_extract_seconds": 0.4018602499854751,
+        "project_match_seconds": 0.00683137500891462,
+        "report_seconds": 0.052079792018048465,
+        "analysis_seconds": 0.7254617910366505,
+        "json_seconds": 0.012460957979783416
+      },
+      "peak_rss_bytes": 642400256,
+      "report_sha256": "d6f5b7cd546cc07d9715cc13e65da2008fe5fe3107fd14a6d8f68cebfe886240",
+      "component_count": 333,
+      "provenance": {
+        "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+        "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+        "software": {
+          "mafer-gcms": "0.1.0",
+          "numpy": "2.5.3",
+          "scipy": "1.18.1",
+          "rainbow-api": "1.5.2"
+        },
+        "numeric_dtype": "float64",
+        "mass_binning": "nearest integer, ties to even, summed intensities"
+      },
+      "process_wall_seconds": 1.7422997080138884
+    },
+    {
+      "timings": {
+        "input_seconds": 0.279730667010881,
+        "preprocess_seconds": 0.2504139999509789,
+        "detect_extract_seconds": 0.46741170797031373,
+        "project_match_seconds": 0.015638166980352253,
+        "report_seconds": 0.07049204199574888,
+        "analysis_seconds": 0.8121918750111945,
+        "json_seconds": 0.010244916018564254
+      },
+      "peak_rss_bytes": 686292992,
+      "report_sha256": "d6f5b7cd546cc07d9715cc13e65da2008fe5fe3107fd14a6d8f68cebfe886240",
+      "component_count": 333,
+      "provenance": {
+        "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+        "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+        "software": {
+          "mafer-gcms": "0.1.0",
+          "numpy": "2.5.3",
+          "scipy": "1.18.1",
+          "rainbow-api": "1.5.2"
+        },
+        "numeric_dtype": "float64",
+        "mass_binning": "nearest integer, ties to even, summed intensities"
+      },
+      "process_wall_seconds": 1.7643214159761555
+    },
+    {
+      "timings": {
+        "input_seconds": 0.27056587499100715,
+        "preprocess_seconds": 0.23935437499312684,
+        "detect_extract_seconds": 0.5071808329666965,
+        "project_match_seconds": 0.007836000004317611,
+        "report_seconds": 0.06208408297970891,
+        "analysis_seconds": 0.8211809170315973,
+        "json_seconds": 0.011761041008867323
+      },
+      "peak_rss_bytes": 685785088,
+      "report_sha256": "d6f5b7cd546cc07d9715cc13e65da2008fe5fe3107fd14a6d8f68cebfe886240",
+      "component_count": 333,
+      "provenance": {
+        "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+        "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+        "software": {
+          "mafer-gcms": "0.1.0",
+          "numpy": "2.5.3",
+          "scipy": "1.18.1",
+          "rainbow-api": "1.5.2"
+        },
+        "numeric_dtype": "float64",
+        "mass_binning": "nearest integer, ties to even, summed intensities"
+      },
+      "process_wall_seconds": 1.7901035000104457
+    },
+    {
+      "timings": {
+        "input_seconds": 0.3391147500369698,
+        "preprocess_seconds": 0.24681933398824185,
+        "detect_extract_seconds": 0.40567312500206754,
+        "project_match_seconds": 0.006920040992554277,
+        "report_seconds": 0.05648600001586601,
+        "analysis_seconds": 0.7204861249774694,
+        "json_seconds": 0.009972041007131338
+      },
+      "peak_rss_bytes": 604995584,
+      "report_sha256": "d6f5b7cd546cc07d9715cc13e65da2008fe5fe3107fd14a6d8f68cebfe886240",
+      "component_count": 333,
+      "provenance": {
+        "input_data_ms_sha256": "9cde58b1fa306fe6fbf7cfba6b1b9669b39f4bdef587dbc94d1dcf7300daff3b",
+        "library_sha256": "36a9ef24c89c40e6fa8908907e09d8f42ca8816a899daee1df380daf2ff8174d",
+        "software": {
+          "mafer-gcms": "0.1.0",
+          "numpy": "2.5.3",
+          "scipy": "1.18.1",
+          "rainbow-api": "1.5.2"
+        },
+        "numeric_dtype": "float64",
+        "mass_binning": "nearest integer, ties to even, summed intensities"
+      },
+      "process_wall_seconds": 1.74043674999848
+    }
+  ],
+  "warm_runs": [
+    {
+      "preprocess_seconds": 0.20818283298285678,
+      "detect_extract_seconds": 0.4398890830343589,
+      "project_match_seconds": 0.006943084008526057,
+      "report_seconds": 0.04904441599501297,
+      "analysis_wall_seconds": 0.7105028749792837
+    },
+    {
+      "preprocess_seconds": 0.21526462497422472,
+      "detect_extract_seconds": 0.4159177500405349,
+      "project_match_seconds": 0.006392957991920412,
+      "report_seconds": 0.048013583989813924,
+      "analysis_wall_seconds": 0.6920188330113888
+    },
+    {
+      "preprocess_seconds": 0.19349608302582055,
+      "detect_extract_seconds": 0.39773220801725984,
+      "project_match_seconds": 0.0074668750166893005,
+      "report_seconds": 0.07328458299161866,
+      "analysis_wall_seconds": 0.678320209030062
+    },
+    {
+      "preprocess_seconds": 0.19953737501055002,
+      "detect_extract_seconds": 0.4862239999929443,
+      "project_match_seconds": 0.006180333031807095,
+      "report_seconds": 0.052174916956573725,
+      "analysis_wall_seconds": 0.750442458956968
+    },
+    {
+      "preprocess_seconds": 0.20417591597652063,
+      "detect_extract_seconds": 0.3992437090491876,
+      "project_match_seconds": 0.006361750012729317,
+      "report_seconds": 0.04818416602211073,
+      "analysis_wall_seconds": 0.6640627079759724
+    },
+    {
+      "preprocess_seconds": 0.19510937499580905,
+      "detect_extract_seconds": 0.4017185000120662,
+      "project_match_seconds": 0.006153167050797492,
+      "report_seconds": 0.04921470896806568,
+      "analysis_wall_seconds": 0.6583052080241032
+    },
+    {
+      "preprocess_seconds": 0.19429691694676876,
+      "detect_extract_seconds": 0.3990198749816045,
+      "project_match_seconds": 0.006191166990902275,
+      "report_seconds": 0.05516358296154067,
+      "analysis_wall_seconds": 0.6607574160443619
+    }
+  ],
+  "scope": "Fresh: interpreter/imports + input validation/read + analysis + JSON serialization. Warm: validated decoded arrays + processing/report model. No HTTP, HTML or report disk write. Disk caches are not flushed. RSS includes interpreter and native libraries."
+}
