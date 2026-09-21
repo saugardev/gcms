@@ -135,6 +135,19 @@ class SignalTests(unittest.TestCase):
         np.testing.assert_allclose(scores, match_spectra(q * 100, reference * 7))
         np.testing.assert_array_equal(scores[1], [0, 0])
 
+    def test_identical_reference_vectors_have_exactly_equal_scores(self):
+        rng = np.random.default_rng(7)
+        queries = rng.random((333, 281))
+        reference = rng.random((812, 281))
+        # These positions exercise different BLAS tiles on Linux. Roundoff must
+        # not reverse stable library order for indistinguishable references.
+        reference[810] = reference[541]
+        scores = match_spectra(queries, reference)
+        np.testing.assert_array_equal(scores[:, 541], scores[:, 810])
+        np.testing.assert_allclose(
+            scores[:, 541], match_spectra(queries, reference[541:542])[:, 0]
+        )
+
     def test_sample_scaling_and_repeatability(self):
         run, library, _ = synthetic_case()
         report = analyze(run, library)

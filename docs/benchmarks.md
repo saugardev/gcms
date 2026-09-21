@@ -15,6 +15,11 @@ This measures a **Rust numerical engine inside the existing Python application**
 It is not a standalone Rust API or vendor-file reader. Both engines use float64,
 one numerical thread and the unchanged `coapex-1` rules.
 
+The saved timings below predate a Linux portability correction: Python now scores
+identical normalized reference vectors once and expands their original columns,
+preventing BLAS rounding from reordering tied candidates. This is a correctness
+fix; the saved measurements do not measure its additional cost.
+
 ## Rust grouping experiment
 
 Rust now selects the strongest event per ion directly, preserving the first event

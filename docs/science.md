@@ -63,6 +63,9 @@ the behavior a Rust implementation must reproduce to claim a performance compari
    outside the acquired range is excluded from the score but its fraction is reported.
    Rust omits products with exact-zero query values; it retains every nonzero
    value in mass order and does not approximate small intensities as zero.
+   Python scores each exactly equal normalized reference vector once and restores
+   all original group columns. This prevents BLAS rounding from breaking exact
+   ties after mass-range projection; reference identities remain separate.
 8. **Report uncertainty.** Keep the top three distinct reference groups by default;
    exact score ties retain original group order. A best score ≥0.75 and retained
    reference intensity ≥0.5 pass screening. A second group within 0.03 of the best,

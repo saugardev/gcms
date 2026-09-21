@@ -176,7 +176,10 @@ def match_spectra(
     """Square-root cosine on the measured nominal-mass grid, with zero-filled ions."""
     if not reference_normalized:
         reference = normalize_spectra(reference)
-    return np.clip(normalize_spectra(spectra) @ reference.T, 0, 1)
+    # BLAS can accumulate identical columns differently at matrix tile boundaries.
+    # Score each exact reference vector once so stable ranking preserves true ties.
+    unique, inverse = np.unique(reference, axis=0, return_inverse=True)
+    return np.clip(normalize_spectra(spectra) @ unique.T, 0, 1)[:, inverse]
 
 
 def spectrum_model(mz, intensity) -> Spectrum:

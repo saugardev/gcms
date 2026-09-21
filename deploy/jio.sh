@@ -25,7 +25,13 @@ fi
 
 published="$(jio ports "$vm")"
 url="$(awk '$1 == 8000 && $2 == "published" { print $3; exit }' <<< "$published")"
-[[ -n "$url" ]] || url="$(jio expose 8000 "$vm")"
+if [[ -z "$url" ]]; then
+  for attempt in 1 2 3; do
+    if url="$(jio expose 8000 "$vm")"; then break; fi
+    [[ "$attempt" != 3 ]] || exit 1
+    sleep 35
+  done
+fi
 [[ "$url" =~ ^https://[a-zA-Z0-9.-]+(:[0-9]+)?$ ]] || { echo 'Invalid HTTPS origin from Jio' >&2; exit 1; }
 for path in /health / '/v1/sample?review=true&engine=python' '/v1/sample?review=true&engine=rust'; do
   curl --fail --silent --show-error --retry 10 --retry-all-errors --retry-delay 2 --max-time 120 "$url$path" --output /dev/null
