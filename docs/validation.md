@@ -21,6 +21,19 @@ exactly; floats use `rtol=1e-6, atol=1e-8`. See the
 [noise/library reuse measurements](../examples/reuse-comparison.json), and
 [direct-grouping measurements and equivalence results](../examples/grouping-comparison.json).
 
+The Linux x86_64 deployment also passes the 36-test suite and complete Python/Rust
+review comparison. Its default analysis matches the original macOS results after
+accounting for the configured sample's renamed directory. Cross-platform full
+reviews are **not identical**: the `less_smoothing` profile detects 369 components
+on Linux versus 370 on macOS (one fewer unassigned detection), shifting later
+variant IDs and some evidence values. The 333 baseline detections and all 45
+consistent / 288 sensitive labels remain unchanged. Retain the runtime platform
+with each report; within-platform engine parity is not a guarantee of identical
+results across platforms. The difference comes from roundoff in the three-point
+Savitzky–Golay coefficients shifting one flat peak's apex across the grouping
+window boundary. Substituting the Linux coefficients on macOS reproduces it.
+See the [deployment comparison](../examples/deployment-validation.json).
+
 ## Harder synthetic evaluation
 
 Run `uv run --locked gcms evaluate --out artifacts/evaluation.json`.
