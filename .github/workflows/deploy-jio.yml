@@ -16,6 +16,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    environment:
+      name: production
+      url: ${{ steps.url.outputs.app_url }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -28,6 +31,7 @@ jobs:
           JIO_INSTALL_DIR="$RUNNER_TEMP/bin" sh "$RUNNER_TEMP/install-jio.sh"
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
       - name: Deploy and verify
+        id: deploy
         env:
           JIO_STATE_DIR: ${{ runner.temp }}/jio
           JIO_API_KEY: ${{ secrets.JIO_API_KEY }}
@@ -47,3 +51,18 @@ jobs:
           printf 'large\n' > "$session/requested-size"
           unset JIO_SSH_KEY
           bash deploy/jio.sh
+      - name: Publish app URL and deployment status
+        id: url
+        if: always()
+        env:
+          JIO_STATE_DIR: ${{ runner.temp }}/jio
+          JIO_API_KEY: ${{ secrets.JIO_API_KEY }}
+          JIO_VM_ID: ${{ vars.JIO_VM_ID }}
+          JIO_ENDPOINT: ${{ vars.JIO_ENDPOINT }}
+          DEPLOY_STATUS: ${{ steps.deploy.outcome }}
+        run: |
+          [[ -n "$JIO_ENDPOINT" ]] || unset JIO_ENDPOINT
+          url="$(jio ports "$JIO_VM_ID" | awk '$1 == 8000 { print $3; exit }')"
+          [[ "$url" =~ ^https://[a-zA-Z0-9.-]+(:[0-9]+)?$ ]] || { echo 'No app URL has been allocated yet' >> "$GITHUB_STEP_SUMMARY"; exit 1; }
+          printf 'app_url=%s\n' "$url" >> "$GITHUB_OUTPUT"
+          printf '[Open GCMS](%s)\n\nDeployment checks: **%s**.\n' "$url" "$DEPLOY_STATUS" | tee -a "$GITHUB_STEP_SUMMARY"

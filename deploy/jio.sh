@@ -37,4 +37,3 @@ for path in /health / '/v1/sample?review=true&engine=python' '/v1/sample?review=
   curl --fail --silent --show-error --retry 10 --retry-all-errors --retry-delay 2 --max-time 120 "$url$path" --output /dev/null
 done
 printf 'App: %s\nRevision: %s\n' "$url" "$revision"
-[[ -z "${GITHUB_STEP_SUMMARY:-}" ]] || printf '[Open GCMS](%s) — %s\n' "$url" "$revision" >> "$GITHUB_STEP_SUMMARY"

@@ -6,7 +6,9 @@ Pushing `main` or manually running **Deploy GCMS** in GitHub Actions deploys the
 exact commit to the dedicated Jio VM. The workflow builds a new release, tests
 it, switches a `current` symlink, restarts systemd and
 restores the previous release if local health checks fail. The action summary
-contains the public HTTPS link. Both Python and Rust sample reviews are checked.
+and production environment contain the allocated HTTPS link even when deployment
+checks fail; the summary reports their status separately. Both Python and Rust
+sample reviews are checked.
 
 The VM uses the **gcms** Jio account, Large size (4 vCPU, 8 GiB). GitHub needs
 secrets `JIO_API_KEY` and `JIO_SSH_KEY`, plus variable `JIO_VM_ID`. The SSH secret
