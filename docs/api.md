@@ -19,8 +19,11 @@ A malformed library fails startup rather than silently discarding entries.
 Open **http://127.0.0.1:8000/** for the dashboard. Upload a ZIP, choose Python or
 Rust, and enable or disable stability checks. Optionally set
 `GCMS_SAMPLE=/absolute/path/to/sample.D` before startup to load a configured sample
-automatically with Python and stability checks. Loading and error states
-include retry; a failed analysis preserves the previous result.
+automatically with Rust and stability checks. Rust is the default dashboard engine;
+build the [Rust extension](benchmarks.md#run-the-rust-version) first or select Python.
+A small label beside **Load configured sample** shows server processing time
+(acquisition reading, analysis, stability checks when enabled, and HTML rendering).
+Loading and error states include retry; a failed analysis preserves the previous result.
 
 Create a ZIP and send it as the request body:
 

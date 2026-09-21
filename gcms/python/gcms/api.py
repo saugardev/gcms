@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import BoundedSemaphore
+from time import perf_counter
 from typing import Annotated, Literal
 
 from fastapi import FastAPI, Query, Request
@@ -34,17 +35,21 @@ class UploadParameters(Parameters):
 
 
 def _analyze_sample(sample, library, options):
+    started = perf_counter()
     params = Parameters.model_validate(options.model_dump(exclude={"output", "engine", "review"}))
     run = read_run(sample)
+    review = None
     if options.review:
         review = build_review(run, library, params, engine=options.engine)
-        return (
-            HTMLResponse(render_report(review.analysis, review=review))
-            if options.output == "html"
-            else review
+        report = review.analysis
+    else:
+        report = analyze(run, library, params, engine=options.engine)
+    if options.output == "html":
+        html = render_report(report, review=review)
+        return HTMLResponse(
+            html, headers={"Server-Timing": f"processing;dur={(perf_counter() - started) * 1000:.3f}"}
         )
-    report = analyze(run, library, params, engine=options.engine)
-    return HTMLResponse(render_report(report)) if options.output == "html" else report
+    return review if review is not None else report
 
 
 def create_app(library_path: Path | None = None, sample_path: Path | None = None):

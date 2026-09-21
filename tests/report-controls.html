@@ -90,6 +90,45 @@ function page(doc, action) { doc.querySelector(`[data-page="${action}"]`).click(
   frame.contentWindow.dispatchEvent(new Event('afterprint')); count(doc, 12, 2);
   page(doc, 'first'); count(doc, 12);
   check(!doc.getElementById('evidence-hint').hidden, 'Changing page clears previous selection');
-  result.textContent = 'PASS — pagination, last page, page jumps, global sorting, filters, reset, empty results, precision, missing scores, single inspector, deep links and printing.';
+  const dashboard = await (await fetch('../gcms/python/gcms/dashboard.html')).text();
+  let request, fail = false, duration = '1234.000';
+  window.dashboardFetch = async (url, options) => {
+    request = {url, options};
+    return fail ? new Response('{}', {status:503}) : new Response('<p>Analysis result</p>', {headers:{'Server-Timing':`processing;dur=${duration}`}});
+  };
+  await new Promise(resolve => {
+    frame.onload = resolve;
+    frame.srcdoc = dashboard.replace('__SAMPLE_AVAILABLE__', 'true').replace('<script>', '<script>window.fetch = parent.dashboardFetch;');
+  });
+  doc = frame.contentDocument;
+  async function settled() {
+    for (let i = 0; i < 100 && doc.getElementById('analysis-form').getAttribute('aria-busy') !== 'false'; i++) {
+      await new Promise(resolve => setTimeout(resolve, 20));
+    }
+    check(doc.getElementById('analysis-form').getAttribute('aria-busy') === 'false', 'Analysis completed');
+  }
+  await settled();
+  check(doc.getElementById('engine').value === 'rust' && request.url.includes('engine=rust'), 'Rust is the default on first load');
+  const timing = doc.getElementById('processing-time');
+  check(timing.textContent === 'Processed in 1.23 s', 'Shows server processing time in seconds');
+  check(doc.getElementById('load-sample').nextElementSibling === timing, 'Timing is beside the sample button');
+  fail = true;
+  doc.getElementById('load-sample').click();
+  check(timing.textContent === '', 'Clears previous timing when loading');
+  await settled();
+  check(timing.textContent === '' && !doc.getElementById('retry').hidden, 'Failure has no stale timing');
+  fail = false; duration = '2345.000';
+  doc.getElementById('retry').click();
+  await settled();
+  check(timing.textContent === 'Processed in 2.35 s', 'Retry updates processing time');
+  doc.getElementById('engine').value = 'python';
+  const files = new DataTransfer();
+  files.items.add(new File(['test'], 'sample.zip', {type:'application/zip'}));
+  doc.getElementById('sample-file').files = files.files;
+  doc.querySelector('button[type="submit"]').click();
+  await settled();
+  check(request.url.startsWith('/v1/analyze?') && request.url.includes('engine=python') && request.options.method === 'POST', 'ZIP uploads respect the selected engine');
+  check(timing.textContent === 'Processed in 2.35 s', 'ZIP uploads show processing time');
+  result.textContent = 'PASS — report controls, default Rust loading, server processing time, ZIP uploads, Python selection, errors and retries.';
 })().catch(error => { result.textContent = `FAIL — ${error.message}`; });
 </script></html>

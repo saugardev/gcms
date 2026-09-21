@@ -32,6 +32,31 @@ def make_zip(entries):
 
 
 class ApiConfigurationTests(unittest.TestCase):
+    def test_html_processing_time_for_sample_and_upload(self):
+        run, library, _ = synthetic_case()
+        with (
+            patch("gcms.api.read_library", return_value=library),
+            patch("gcms.api.read_run", return_value=run),
+            patch("gcms.api.extract_sample", return_value=Path("sample.D")),
+            TestClient(create_app(Path("library.msp"), Path("sample.D"))) as client,
+        ):
+            for review in ("false", "true"):
+                for method, path, kwargs in (
+                    ("GET", "/v1/sample", {}),
+                    (
+                        "POST",
+                        "/v1/analyze",
+                        {"content": b"zip", "headers": {"Content-Type": "application/zip"}},
+                    ),
+                ):
+                    with patch("gcms.api.perf_counter", side_effect=[10, 11.234]):
+                        response = client.request(
+                            method, f"{path}?output=html&review={review}", **kwargs
+                        )
+                    self.assertEqual(response.status_code, 200, response.text[:200])
+                    self.assertEqual(response.headers["server-timing"], "processing;dur=1234.000")
+                    self.assertIn("<section><h2>Total ion chromatogram</h2>", response.text)
+
     def test_external_library_is_required_and_sample_is_optional(self):
         with (
             patch("gcms.api.DEFAULT_LIBRARY", None),

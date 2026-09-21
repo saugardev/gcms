@@ -8,6 +8,7 @@
 *{box-sizing:border-box}body{margin:0;height:100dvh;display:flex;flex-direction:column;background:var(--soft);color:var(--ink);font:14px/1.5 system-ui,sans-serif}
 header{background:var(--surface);padding:16px 24px;border-bottom:1px solid var(--border)}h1{font-size:18px;margin:0}p{margin:0;color:var(--muted)}
 .topline,form{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.topline{justify-content:space-between;margin-bottom:12px}a{color:var(--accent)}
+.sample-action{display:flex;align-items:center;gap:12px;flex-wrap:wrap}#processing-time{font-size:12px;color:var(--muted)}
 label{font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px}input,select,button{font:inherit;color:inherit;max-width:100%}
 input[type=file]{width:240px}input::file-selector-button,select,button{min-height:40px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface)}
 button{cursor:pointer}button.primary{background:var(--accent);color:var(--surface);border-color:var(--accent)}button:disabled{cursor:default;opacity:.5}
@@ -20,9 +21,9 @@ main{flex:1;min-height:0;position:relative}iframe{width:100%;height:100%;border:
   <div class="topline"><h1>Mafer <span style="font-weight:400">/ GC-MS dashboard</span></h1><a href="/docs" target="_blank" rel="noopener">API documentation</a></div>
   <form id="analysis-form">
     <label class="file">Sample ZIP <input id="sample-file" type="file" accept=".zip,application/zip" aria-describedby="upload-help"></label>
-    <label>Engine <select id="engine"><option value="python">Python</option><option value="rust">Rust</option></select></label>
+    <label>Engine <select id="engine"><option value="rust">Rust</option><option value="python">Python</option></select></label>
     <label style="min-height:40px"><input id="review" type="checkbox" checked> Check stability</label>
-    <button class="primary" type="submit">Analyze ZIP</button><button id="load-sample" type="button">Load configured sample</button>
+    <button class="primary" type="submit">Analyze ZIP</button><div class="sample-action"><button id="load-sample" type="button">Load configured sample</button><span id="processing-time" role="status" aria-live="polite"></span></div>
   </form>
   <p id="upload-help">ZIP containing one complete .D acquisition · maximum 64 MiB</p>
 </header>
@@ -38,11 +39,13 @@ const frame = document.getElementById('report');
 const status = document.getElementById('status');
 const error = document.getElementById('error');
 const retry = document.getElementById('retry');
+const processingTime = document.getElementById('processing-time');
 let lastFile = null, busy = false, reportUrl = '';
 async function load(file = null) {
   if (busy) return;
   lastFile = file;
   error.hidden = retry.hidden = true;
+  processingTime.textContent = '';
   if (file && file.size > 64 * 1024 * 1024) {
     error.textContent = 'This ZIP exceeds 64 MiB. Choose a smaller acquisition archive.';
     error.hidden = false;
@@ -66,6 +69,8 @@ async function load(file = null) {
     await new Promise(resolve => { frame.onload = resolve; frame.src = nextUrl; frame.hidden = false; });
     if (reportUrl) URL.revokeObjectURL(reportUrl);
     reportUrl = nextUrl;
+    const duration = response.headers.get('Server-Timing')?.match(/processing;dur=([\d.]+)/)?.[1];
+    if (duration) processingTime.textContent = `Processed in ${(Number(duration) / 1000).toFixed(2)} s`;
     status.textContent = `${file ? file.name : 'Configured sample'} · ${document.getElementById('engine').selectedOptions[0].text} · 10 components per page`;
   } catch (failure) {
     status.textContent = frame.hidden ? 'No result loaded.' : 'Previous result retained.';

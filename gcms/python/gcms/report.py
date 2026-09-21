@@ -472,8 +472,8 @@ details{{border-top:1px solid #dce4e2;padding:14px 0;scroll-margin-top:20px}}sum
 <div><strong>{report.summary["statuses"].get("tentative", 0)}</strong><span>tentative identities</span></div>
 <div><strong>{report.summary["statuses"].get("ambiguous", 0)}</strong><span>ambiguous identities</span></div>
 <div><strong>{report.summary["statuses"].get("unassigned", 0)}</strong><span>unassigned</span></div></div>
-<details class="panel"><summary>Total ion chromatogram</summary>{_chromatogram(report, components)}
-<p class="legend"><span>Corrected signal</span><span>Detected component markers</span>Gray: raw signal. Markers include all filtered components. Click one to open its page and evidence. Display is downsampled with extrema preserved.</p></details>
+<section><h2>Total ion chromatogram</h2>{_chromatogram(report, components)}
+<p class="legend"><span>Corrected signal</span><span>Detected component markers</span>Gray: raw signal. Markers include all filtered components. Click one to open its page and evidence. Display is downsampled with extrema preserved.</p></section>
 <section id="detected-components"><h2>Detected components</h2><p class="muted">Area % is the share of reported component-ion areas, not concentration. Filters preserve full-report totals.</p>
 <form id="component-controls" class="filters" hidden role="search" aria-label="Filter components">
 <label class="search">Search components<input id="component-search" type="search" autocomplete="off" placeholder="Component ID, candidate name or CAS" aria-describedby="search-help"></label>
