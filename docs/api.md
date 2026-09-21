@@ -63,9 +63,9 @@ unencrypted ZIPs. Renaming the sample does not affect processing.
 
 The response arrives synchronously. Each process accepts one analysis at a time
 and returns `503` with `Retry-After: 2` while occupied; clients may retry after
-that delay. Temporary uploads are removed after processing. No job database,
-authentication or public hosting is included. The documented command binds to
-the local machine; an external deployment needs the lab's access controls and TLS.
+that delay. Temporary uploads are removed after processing. There is no job
+database or user authentication. The command above binds to the local machine;
+the [Jio deployment](deployment.md) provides a public demo over HTTPS.
 
 ## Parameters
 

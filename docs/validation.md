@@ -14,6 +14,13 @@ identification accuracy on the supplied acquisition remains **unmeasured**.
 | The implementation has known failure modes | The 48-case stress experiment below | A population error rate or independent benchmark |
 | Source and setup can be checked independently | Fresh archive installation, fresh Rust compilation, tests and original-result comparison | A second operating-system test or bit-identical binaries across machines |
 
+The latest performance changes were checked in both engines against the original
+13-array fixture, analysis report and complete review. Discrete outputs agree
+exactly; floats use `rtol=1e-6, atol=1e-8`. See the
+[initial optimization measurements](../examples/optimization-comparison.json) and
+[noise/library reuse measurements](../examples/reuse-comparison.json), and
+[direct-grouping measurements and equivalence results](../examples/grouping-comparison.json).
+
 ## Harder synthetic evaluation
 
 Run `uv run --locked gcms evaluate --out artifacts/evaluation.json`.

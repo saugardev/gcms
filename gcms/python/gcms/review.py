@@ -16,7 +16,7 @@ from .models import (
     ReviewReport,
     ReviewVariant,
 )
-from .pipeline import analyze, match_spectra
+from .pipeline import Prepared, analyze, match_spectra
 
 MATCH_SECONDS = 0.75
 MATCH_SIMILARITY = 0.8
@@ -191,6 +191,16 @@ def build_review(run, library, params=None, *, engine="python", timings=None):
     arrays = {}
     start = perf_counter()
     baseline = analyze(run, library, params, engine=engine, arrays=arrays)
+    prepared = Prepared(arrays["corrected"], arrays["baseline_tic"], arrays["noise"])
+    # Additional reuse helped Python; equivalent Rust experiments did not show
+    # a repeatable end-to-end gain, so Rust keeps its existing numerical path.
+    reference = None
+    if engine == "python":
+        reference = (
+            arrays["reference_intensity"],
+            arrays["reference_mass_fraction"],
+            arrays["reference_normalized"],
+        )
     timings["baseline_seconds"] = perf_counter() - start
     records = {p.component_id: [] for p in baseline.components}
     variants = [
@@ -236,7 +246,19 @@ def build_review(run, library, params=None, *, engine="python", timings=None):
             continue
         seen.add(key)
         try:
-            other = analyze(run, library, proposed, engine=engine)
+            same_preprocessing = (
+                proposed.smoothing_seconds == params.smoothing_seconds
+                and proposed.baseline_seconds == params.baseline_seconds
+            )
+            other = analyze(
+                run,
+                library,
+                proposed,
+                engine=engine,
+                _prepared=prepared if same_preprocessing else None,
+                _noise=prepared.noise if engine == "python" else None,
+                _reference=reference,
+            )
         except (ProcessingError, ValueError) as exc:
             variants.append(
                 ReviewVariant(name=name, parameters=settings, state="failed", reason=str(exc))

@@ -21,6 +21,29 @@ from gcms.rust_backend import native
 
 
 class ReviewTests(unittest.TestCase):
+    def test_reused_preprocessing_matches_independent_runs_and_does_not_leak(self):
+        def independent(*args, **kwargs):
+            for key in ("_prepared", "_noise", "_reference"):
+                kwargs.pop(key, None)
+            return analyze(*args, **kwargs)
+
+        engines = ["python"]
+        try:
+            native()
+        except ProcessingError:
+            pass  # Optional Rust checks have their own skipped test class below.
+        else:
+            engines.append("rust")
+        for engine in engines:
+            for i, kind in enumerate(("isolated", "overlap", "blank")):
+                run, library, _ = synthetic_case(kind)
+                library.spectra[0][:, 0] += i  # Reuse must not leak between different libraries.
+                with patch("gcms.review.analyze", side_effect=independent):
+                    expected = build_review(run, library, engine=engine)
+                self.assertEqual(
+                    build_review(run, library, engine=engine).model_dump(), expected.model_dump()
+                )
+
     def test_known_peaks_and_plot_integrals(self):
         run, library, _ = synthetic_case()
         review = build_review(run, library)
@@ -201,7 +224,7 @@ class ReviewRustTests(unittest.TestCase):
                 self.core.correspondences(at, invalid, bt, b, 0.75, 0.8)
 
     def test_complete_reviews_agree(self):
-        cases = [synthetic_case()[:2]]
+        cases = [synthetic_case(kind)[:2] for kind in ("isolated", "overlap", "blank")]
         if DEFAULT_SAMPLE and DEFAULT_LIBRARY:
             cases.append((read_run(DEFAULT_SAMPLE), read_library(DEFAULT_LIBRARY)))
         for run, library in cases:

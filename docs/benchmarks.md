@@ -15,6 +15,146 @@ This measures a **Rust numerical engine inside the existing Python application**
 It is not a standalone Rust API or vendor-file reader. Both engines use float64,
 one numerical thread and the unchanged `coapex-1` rules.
 
+## Rust grouping experiment
+
+Rust now selects the strongest event per ion directly, preserving the first event
+on equal prominence. Reused selection vectors replace per-group allocation and
+two sorts. Python retains its equivalent reference implementation.
+
+Eight warm runs per engine/workflow were measured in rotating order, with one
+active worker at a time. Grouping alone lowered review medians from **1.430 to
+1.384 s** in the first batch and **1.460 to 1.415 s** in the second (about 3%). It
+was faster in 5/8 paired rounds in each batch; background workloads were not
+controlled, so this small observed benefit is not a reliable latency guarantee.
+
+Broad filter-buffer reuse was slightly slower and was rejected. A sparse grouping
+variant had mixed paired timings and was also omitted. The simpler direct
+selection remains. Both batches include the equivalent Python workflow and all
+rejected results, stage timings and source/build hashes in the
+[raw measurements](../examples/grouping-comparison.json). No further single-analysis
+speedup is claimed because the timings were noisy.
+
+A regression case covers duplicate ions, equal and unequal prominences, relative
+height filtering and rejected seeds. The retained engines match the original
+13-array bundle and complete reports with the existing tolerance and exact
+component ordering/statuses. Scientific rules and thresholds are unchanged.
+
+## Noise/library reuse experiment
+
+**Retained in Python:** estimate noise once instead of three times per full
+review, and prepare the projected/normalized library once instead of seven times.
+Smoothing alternatives still rebuild their corrected signals, and every profile
+still detects and scores its own components. Reuse stays inside one review.
+
+**Tested in Rust, then omitted:** equivalent noise/library reuse, plus a second
+candidate that iterated contiguous prepared-reference rows. The whole-review
+measurements were mixed, so the existing, simpler Rust numerical path remains.
+Both engines retain the earlier reuse of corrected signals across compatible profiles.
+
+Nine adjacent before/after pairs were measured per candidate, alternating which
+revision ran first. Each revision had its own persistent process, decoded inputs
+and one warm-up; only one worker computed at a time. These are warm full reviews:
+
+| Candidate | Before median | Candidate median | Median time saved per pair | Faster pairs |
+|---|---:|---:|---:|---:|
+| Python reuse | 2.882 s | 2.707 s | 8.5% | 7/9 |
+| Rust reuse | 1.326 s | 1.337 s | −1.1% | 4/9 |
+| Rust reuse + contiguous row iteration | 1.429 s | 1.440 s | 4.0% | 7/9 |
+
+Python's ratio of overall medians improved by **6.1%**. The paired statistic is
+separate: the median of `1 − candidate_time / before_time` for adjacent runs.
+Rust's second candidate improved that statistic, but neither candidate lowered
+the overall median; no clear overall median benefit was established on this host.
+All reports had identical hashes within each engine across these comparisons.
+
+An initial five-repeat experiment rotating four modes (neither new reuse, noise
+only, library only, both) suggested about 9% savings in both engines relative to
+the new implementation with reuse disabled. The comparisons against the actual
+previous implementation above did not establish the same Rust improvement.
+Both sets of results are retained, including the rejected candidates.
+
+[Raw measurements and source/build hashes](../examples/reuse-comparison.json)
+also include five fresh-process and five warm runs per engine/workflow for the
+first candidate, plus final-version review measurements. Other applications
+were using the machine; background workload and power mode were not controlled.
+No stable startup, memory or single-analysis improvement is claimed. One analysis
+has no repeated profiles to reuse.
+
+The retained implementations match the original 13-array bundle, analysis report
+and full review within the existing tolerance. Tests compare reused data with
+independent recomputation in both engines and change acquisitions/libraries
+between reviews. No global cache, extra threads, scientific parameter changes or
+new dependencies were introduced.
+
+## Earlier optimization experiment
+
+Five fresh-process and five warm repeats per implementation on the same supplied
+acquisition, measured sequentially on macOS arm64 with one numerical thread.
+The before version is commit `8623ac0`; the after version is identified by source
+and native-library hashes in [the complete measurements](../examples/optimization-comparison.json).
+
+| Warm workflow | Python before → after | Python speedup | Rust before → after | Rust speedup |
+|---|---:|---:|---:|---:|
+| Single analysis, median | 0.739 → 0.492 s | 1.50× | 0.463 → 0.244 s | 1.90× |
+| Full seven-run review, median | 5.428 → 2.696 s | 2.01× | 3.399 → 1.366 s | 2.49× |
+
+After optimization, Rust is **2.02× faster for analysis** and **1.97× for review**
+than the optimized Python engine in these warm measurements.
+
+| Fresh-process scope | Python before → after | Rust before → after |
+|---|---:|---:|
+| Single analysis, median | 1.791 → 1.551 s | 1.479 → 1.354 s |
+| Full review, median | 6.469 → 3.967 s | 4.483 → 2.393 s |
+| Analysis peak RSS, median | 644 → 598 MiB | 516 → 472 MiB |
+| Review peak RSS, median | 610 → 709 MiB | 575 → 588 MiB |
+
+Review memory use increased in this measurement, especially for Python; this is
+a speed improvement, not a claim of lower memory use. RSS includes the interpreter,
+reader and allocator behavior. Warm timings exclude input loading and JSON;
+fresh timings include both. Neither measures HTTP or HTML generation. Background
+workload and power settings were not controlled, and OS caches were retained.
+
+The retained approaches remove repeated or unnecessary work:
+
+- Python batches co-apex window searches instead of repeatedly converting the
+  event array for scalar searches. Both engines defer bound medians until a
+  component passes the existing intensity threshold, and the shared report code
+  determines valid references once per report.
+- Rust ends each prominence-base search at its first exact zero on nonnegative
+  traces and skips exact-zero query products when matching spectra. It retains
+  nonzero intensities, mass order, tie rules and float64 precision.
+- Both engines reuse baseline preprocessing for the four review profiles whose
+  smoothing/background settings are unchanged. The two smoothing alternatives
+  still recompute it. All six alternatives still run detection and matching;
+  there is no cache shared across requests.
+
+A separate five-repeat experiment tested column-major input, including conversion
+time, with both engines. Warm review changed from 2.727 to 2.692 s in Python and
+1.397 to 1.415 s in Rust. That small, inconsistent benefit did not justify changing
+the input layout; the implementation remains row-major. Those raw runs and all
+before/after benchmark runs are included in the linked evidence.
+
+Both optimized engines match the original frozen **13 arrays and complete reports**,
+and the saved full review, using `rtol=1e-6, atol=1e-8` for floats and exact discrete
+values. They also match each other. The result remains 333 detections, 24 tentative,
+46 ambiguous and 263 unassigned; review labels remain 45 consistent and 288 sensitive.
+These checks preserve behavior, not independently established chemical accuracy.
+
+Reproduce each workflow with the existing harness after setting the external
+input paths and building Rust as shown below:
+
+```sh
+uv run --locked gcms benchmark --engine python --repeats 5 --out artifacts/python-analysis.json
+uv run --locked gcms benchmark --engine rust --repeats 5 --out artifacts/rust-analysis.json
+uv run --locked gcms benchmark --workflow review --engine python --repeats 5 --out artifacts/python-review.json
+uv run --locked gcms benchmark --workflow review --engine rust --repeats 5 --out artifacts/rust-review.json
+```
+
+For a before/after comparison, run the same commands and inputs from a separate
+checkout of `8623ac0`, with its own release build. Do not mix extension binaries
+between revisions. Individual timings, environment, input hashes, source hashes,
+binary hashes and equivalence results are recorded in the evidence file.
+
 ## Run the Rust version
 
 With the Python environment installed and a Rust toolchain available, from the
@@ -60,7 +200,8 @@ and [filter](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.s
 
 ## Seven-run review workflow
 
-Five repeats per engine on the same macOS arm64 machine:
+The table in this section predates the optimizations above and is retained as
+historical evidence. Five repeats per engine on the same macOS arm64 machine:
 
 | Scope | Python / NumPy / SciPy | Rust kernels + shared Python | Speedup |
 |---|---:|---:|---:|

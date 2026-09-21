@@ -40,6 +40,7 @@ Python 3.12.13 is pinned. Setup and measurements have been verified on macOS arm
 - [Validation](docs/validation.md): measured evidence and reproducible submission checks.
 - [Python and Rust](docs/benchmarks.md): optional Rust build, equivalence and benchmarks.
 - [Implementations](gcms/README.md): source layout and the measured Rust speedup.
+- [Deployment](docs/deployment.md): GitHub Actions, Jio VM and HTTPS demo.
 
 Saved reports and evaluation results are in [examples/](examples/). Download the
 HTML files and open them locally if GitHub displays their source.

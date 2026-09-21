@@ -213,7 +213,8 @@ fn ion_events(
     max_width: f64,
     events: &mut Vec<Event>,
 ) {
-    // ponytail: prominence searches can be quadratic; index higher peaks if long traces dominate.
+    // ponytail: nonzero valleys can still require quadratic searches; index higher
+    // peaks if those traces dominate. A zero is already the lowest possible base.
     let mut i = 1;
     while i + 1 < x.len() {
         if x[i - 1] >= x[i] {
@@ -242,6 +243,9 @@ fn ion_events(
             }
             if x[j] < x[left] {
                 left = j;
+                if x[j] == 0.0 {
+                    break;
+                }
             }
         }
         for j in peak + 1..x.len() {
@@ -250,6 +254,9 @@ fn ion_events(
             }
             if x[j] < x[right] {
                 right = j;
+                if x[j] == 0.0 {
+                    break;
+                }
             }
         }
         let prominence = x[peak] - x[left].max(x[right]);
@@ -342,6 +349,8 @@ fn detect<'py>(
     let mut used = vec![false; events.len()];
     let minimum_height = fraction * y.rows().into_iter().map(|r| r.sum()).fold(0.0, f64::max);
     let mut found: Vec<(Feature, Vec<f64>)> = Vec::new();
+    let mut best = vec![usize::MAX; cols];
+    let mut members = Vec::with_capacity(cols);
     for seed in order {
         if used[seed] {
             continue;
@@ -349,36 +358,30 @@ fn detect<'py>(
         let apex = events[seed].scan;
         let lo = events.partition_point(|e| (e.scan as f64) < apex as f64 - radius);
         let hi = events.partition_point(|e| (e.scan as f64) <= apex as f64 + radius);
-        let all: Vec<usize> = (lo..hi).filter(|&j| !used[j]).collect();
-        let height = all.iter().map(|&j| events[j].height).fold(0.0, f64::max);
-        let mut members: Vec<usize> = all
-            .iter()
-            .copied()
-            .filter(|&j| events[j].height >= height * relative)
-            .collect();
-        members.sort_by(|&a, &b| events[b].prominence.total_cmp(&events[a].prominence));
-        let mut seen = vec![false; cols];
-        members.retain(|&j| {
+        let height = (lo..hi)
+            .filter(|&j| !used[j])
+            .map(|j| events[j].height)
+            .fold(0.0, f64::max);
+        best.fill(usize::MAX);
+        for j in lo..hi {
+            if used[j] || events[j].height < height * relative {
+                continue;
+            }
             let ion = events[j].ion;
-            let fresh = !seen[ion];
-            seen[ion] = true;
-            fresh
-        });
-        members.sort_by_key(|&j| events[j].ion);
+            // Strict improvement keeps the first event on a prominence tie,
+            // matching the previous stable sort of scan-ordered events.
+            if best[ion] == usize::MAX || events[j].prominence > events[best[ion]].prominence {
+                best[ion] = j;
+            }
+        }
+        members.clear();
+        members.extend(best.iter().copied().filter(|&j| j != usize::MAX));
         if members.len() < min_ions {
             used[seed] = true;
             continue;
         }
-        for j in all {
-            used[j] = true;
-        }
+        used[lo..hi].fill(true);
         let ions: Vec<usize> = members.iter().map(|&j| events[j].ion).collect();
-        let mut left: Vec<f64> = members.iter().map(|&j| events[j].left).collect();
-        let mut right: Vec<f64> = members.iter().map(|&j| events[j].right).collect();
-        let start = (median(&mut left).floor() as usize).min(apex - 1);
-        let end = (median(&mut right).ceil() as usize)
-            .max(apex + 1)
-            .min(rows - 1);
         let mut spectrum = vec![0.0; cols];
         for &ion in &ions {
             spectrum[ion] = (y[[apex - 1, ion]] + y[[apex, ion]] + y[[apex + 1, ion]]) / 3.0;
@@ -386,6 +389,12 @@ fn detect<'py>(
         if spectrum.iter().sum::<f64>() < minimum_height {
             continue;
         }
+        let mut left: Vec<f64> = members.iter().map(|&j| events[j].left).collect();
+        let mut right: Vec<f64> = members.iter().map(|&j| events[j].right).collect();
+        let start = (median(&mut left).floor() as usize).min(apex - 1);
+        let end = (median(&mut right).ceil() as usize)
+            .max(apex + 1)
+            .min(rows - 1);
         let trace: Vec<f64> = (start..=end)
             .map(|i| ions.iter().map(|&j| y[[i, j]]).sum())
             .collect();
@@ -488,11 +497,14 @@ fn project_match<'py>(
     let mut scores = Vec::with_capacity(count * groups);
     for row in query.rows() {
         let q = normalized(row.iter().copied());
+        // Extracted spectra contain many exact zeros. Keep the original ion order
+        // while omitting products that cannot contribute to any reference score.
+        let nonzero: Vec<_> = q.iter().enumerate().filter(|(_, v)| **v > 0.0).collect();
         for r in &refs {
             scores.push(
-                q.iter()
-                    .zip(r)
-                    .map(|(a, b)| a * b)
+                nonzero
+                    .iter()
+                    .map(|&(j, a)| a * r[j])
                     .sum::<f64>()
                     .clamp(0.0, 1.0),
             );

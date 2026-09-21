@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+cd "$(dirname "$0")/.."
+vm="${JIO_VM_ID:?Set JIO_VM_ID to the dedicated GCMS VM}"
+revision="${GIT_REF:-$(git rev-parse HEAD)}"
+[[ "$vm" =~ ^[0-9a-f]{32}$ && "$revision" =~ ^[0-9a-f]{40}$ ]] || { echo 'Expected a VM ID and full commit SHA' >&2; exit 1; }
+[[ "$(jio usage)" == "Account: gcms ("* ]] || { echo 'Deployment requires the gcms Jio account' >&2; exit 1; }
+
+if readiness="$(jio exec "$vm" true --timeout 15 2>&1)"; then
+  :
+elif [[ "$readiness" == "jio: session $vm is Stopped" ]]; then
+  jio start "$vm"
+  jio exec "$vm" true --timeout 15
+else
+  printf '%s\n' "$readiness" >&2
+  exit 1
+fi
+
+# Complete heredoc prevents installers from consuming the remaining SSH input.
+{
+  printf "bash -s -- '%s' <<'GCMS_DEPLOY_SCRIPT'\n" "$revision"
+  cat deploy/runtime.sh
+  printf '\nGCMS_DEPLOY_SCRIPT\n'
+} | jio connect "$vm"
+
+published="$(jio ports "$vm")"
+url="$(awk '$1 == 8000 && $2 == "published" { print $3; exit }' <<< "$published")"
+[[ -n "$url" ]] || url="$(jio expose 8000 "$vm")"
+[[ "$url" =~ ^https://[a-zA-Z0-9.-]+(:[0-9]+)?$ ]] || { echo 'Invalid HTTPS origin from Jio' >&2; exit 1; }
+for path in /health / '/v1/sample?review=true&engine=python' '/v1/sample?review=true&engine=rust'; do
+  curl --fail --silent --show-error --retry 10 --retry-all-errors --retry-delay 2 --max-time 120 "$url$path" --output /dev/null
+done
+printf 'App: %s\nRevision: %s\n' "$url" "$revision"
+[[ -z "${GITHUB_STEP_SUMMARY:-}" ]] || printf '[Open GCMS](%s) — %s\n' "$url" "$revision" >> "$GITHUB_STEP_SUMMARY"

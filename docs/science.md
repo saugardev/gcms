@@ -36,6 +36,8 @@ the behavior a Rust implementation must reproduce to claim a performance compari
    Determine integration bounds at 95% of prominence with `peak_widths`.
    Both engines first reject peaks whose height is below the prominence threshold;
    on these nonnegative traces that is an equivalent, cheaper rejection.
+   Rust stops each base search at its first zero, the minimum possible value;
+   this preserves the closest minimum and the resulting prominence and bounds.
 5. **Group and reconstruct.** Sort events by scan then mass channel, then visit
    seeds by descending prominence with stable ties. Gather unused events within
    ±0.5 seconds of the seed in scan coordinates. Remove ions below 1% of the
@@ -45,6 +47,8 @@ the behavior a Rust implementation must reproduce to claim a performance compari
    the seed scan and its immediate neighbors; all other masses remain zero.
    Require summed spectrum intensity at least 0.001 of the maximum corrected TIC.
    This global fraction suppresses weak detections but can miss minor constituents.
+   Python computes all seed-window limits in one batch. Both engines defer
+   integration-bound medians until the group passes the intensity threshold.
 6. **Integrate.** Use the floor/ceiling of the median ion bounds, ensuring at least
    one scan on either side of the seed and clipping to the acquisition. Trapezoidally
    integrate the corrected sum of selected ions against actual seconds. Sort
@@ -57,6 +61,8 @@ the behavior a Rust implementation must reproduce to claim a performance compari
    to zero. Keep missing ions as zeros across the full acquired grid. References
    with zero projected intensity are excluded from ranking. Reference intensity
    outside the acquired range is excluded from the score but its fraction is reported.
+   Rust omits products with exact-zero query values; it retains every nonzero
+   value in mass order and does not approximate small intensities as zero.
 8. **Report uncertainty.** Keep the top three distinct reference groups by default;
    exact score ties retain original group order. A best score ≥0.75 and retained
    reference intensity ≥0.5 pass screening. A second group within 0.03 of the best,
@@ -90,13 +96,22 @@ relative to the supplied baseline parameters:
 |---|---|---|
 | Permissive | Noise multiplier ×0.75; minimum component fraction ×0.5 | 6; 0.0005 |
 | Conservative | Noise multiplier ×1.5; minimum component fraction ×2 | 12; 0.002 |
-| Less / more smoothing | Smoothing duration ×0.5 / ×2 | 0.4 / 1.6 s |
+| Less / more smoothing | Smoothing duration ×0.5 / ×1.5 | 0.4 / 1.2 s |
 | Narrow / wide grouping | Co-apex tolerance ×0.5 / ×1.5 | 0.25 / 0.75 s |
 
 All other parameters stay fixed. Invalid or duplicate parameter profiles are
 skipped explicitly; failed analyses retain their error. Values are not clamped
 to force a test to run. These perturbations are a heuristic sensitivity check,
 not a calibrated model or a search for the true identity.
+
+Both engines reuse the baseline's corrected signal and noise within a review
+when smoothing and background windows are unchanged. Profiles with different
+windows recompute smoothing and background subtraction. Python additionally
+estimates raw-signal noise once per review and prepares the projected/normalized
+library once for the shared mass grid. Equivalent Rust reuse was tested but not
+retained after mixed performance results. All six alternatives
+still run detection and matching independently. Nothing is cached across
+acquisitions or requests.
 
 A baseline component and an alternative are compatible when apex times differ
 by at most 0.75 s and their reconstructed spectra have square-root cosine

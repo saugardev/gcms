@@ -42,7 +42,7 @@ def window_scans(seconds: float, dt: float, length: int) -> int:
     return min(size, length if length % 2 else length - 1)
 
 
-def preprocess(run: Run, params: Parameters) -> Prepared:
+def preprocess(run: Run, params: Parameters, noise=None) -> Prepared:
     dt = float(np.median(np.diff(run.time_seconds)))
     smooth_n = window_scans(params.smoothing_seconds, dt, len(run.time_seconds))
     if smooth_n >= 3:
@@ -54,11 +54,12 @@ def preprocess(run: Run, params: Parameters) -> Prepared:
     baseline = grey_opening(smooth, size=(baseline_n, 1), mode="nearest")
     smooth -= baseline
     np.maximum(smooth, 0, out=smooth)
-    differences = np.diff(run.intensity, axis=0)
-    differences -= np.median(differences, axis=0)
-    # Gaussian-equivalent MAD estimate from successive differences. A one-count
-    # floor keeps sparse/constant channels from having a zero detection threshold.
-    noise = np.maximum(np.median(np.abs(differences), axis=0) / 0.9538725524, 1.0)
+    if noise is None:
+        differences = np.diff(run.intensity, axis=0)
+        differences -= np.median(differences, axis=0)
+        # Gaussian-equivalent MAD estimate from successive differences. A one-count
+        # floor keeps sparse/constant channels from having a zero detection threshold.
+        noise = np.maximum(np.median(np.abs(differences), axis=0) / 0.9538725524, 1.0)
     return Prepared(smooth, baseline.sum(axis=1), noise)
 
 
@@ -108,6 +109,10 @@ def detect_components(run: Run, prepared: Prepared, params: Parameters):
     scan_indices = events[:, 0].astype(int)
     order = np.argsort(-events[:, 3], kind="stable")
     radius = params.coapex_seconds / dt
+    # Batch the searches: a float boundary otherwise casts the integer event array
+    # again for every seed. The full sorted event list and interval rules are unchanged.
+    lower = np.searchsorted(scan_indices, scan_indices - radius, side="left")
+    upper = np.searchsorted(scan_indices, scan_indices + radius, side="right")
     minimum_height = params.min_component_fraction * float(y.sum(axis=1).max())
     features, spectra = [], []
     # ponytail: greedy co-apex grouping cannot separate unresolved co-elution;
@@ -116,8 +121,7 @@ def detect_components(run: Run, prepared: Prepared, params: Parameters):
         if used[seed]:
             continue
         apex = scan_indices[seed]
-        lo = np.searchsorted(scan_indices, apex - radius, side="left")
-        hi = np.searchsorted(scan_indices, apex + radius, side="right")
+        lo, hi = lower[seed], upper[seed]
         members = np.arange(lo, hi)[~used[lo:hi]]
         all_members = members.copy()
         members = members[
@@ -132,12 +136,12 @@ def detect_components(run: Run, prepared: Prepared, params: Parameters):
             continue
         used[all_members] = True
         ions = np.sort(events[members, 1].astype(int))
-        start = max(0, min(apex - 1, int(np.floor(np.median(events[members, 4])))))
-        end = min(len(y) - 1, max(apex + 1, int(np.ceil(np.median(events[members, 5])))))
         spectrum = np.zeros(y.shape[1], dtype=np.float64)
         spectrum[ions] = y[max(0, apex - 1) : min(len(y), apex + 2), :][:, ions].mean(axis=0)
         if spectrum.sum() < minimum_height:
             continue
+        start = max(0, min(apex - 1, int(np.floor(np.median(events[members, 4])))))
+        end = min(len(y) - 1, max(apex + 1, int(np.ceil(np.median(events[members, 5])))))
         area = float(
             np.trapezoid(
                 y[start : end + 1, :][:, ions].sum(axis=1), x=run.time_seconds[start : end + 1]
@@ -166,9 +170,13 @@ def normalize_spectra(spectra: np.ndarray) -> np.ndarray:
     return np.divide(transformed, norms, out=np.zeros_like(transformed), where=norms > 0)
 
 
-def match_spectra(spectra: np.ndarray, reference: np.ndarray) -> np.ndarray:
+def match_spectra(
+    spectra: np.ndarray, reference: np.ndarray, *, reference_normalized=False
+) -> np.ndarray:
     """Square-root cosine on the measured nominal-mass grid, with zero-filled ions."""
-    return np.clip(normalize_spectra(spectra) @ normalize_spectra(reference).T, 0, 1)
+    if not reference_normalized:
+        reference = normalize_spectra(reference)
+    return np.clip(normalize_spectra(spectra) @ reference.T, 0, 1)
 
 
 def spectrum_model(mz, intensity) -> Spectrum:
@@ -189,9 +197,9 @@ def build_report(
 ) -> AnalysisReport:
     components = []
     total_area = sum(f.area for f in features)
+    valid = np.flatnonzero(reference.sum(axis=1) > 0)
     for i, feature in enumerate(features):
         score = scores[i]
-        valid = np.flatnonzero(reference.sum(axis=1) > 0)
         ranked = valid[np.argsort(-score[valid], kind="stable")]
         warnings = []
         margin, close = None, 0
@@ -320,6 +328,9 @@ def analyze(
     timings: dict | None = None,
     arrays: dict | None = None,
     engine: str = "python",
+    _prepared: Prepared | None = None,
+    _noise: np.ndarray | None = None,
+    _reference: tuple | None = None,
 ) -> AnalysisReport:
     """Optional collectors expose stage timings/arrays without altering results."""
     params = params or Parameters()
@@ -332,7 +343,13 @@ def analyze(
     detect = rust_backend.detect_components if engine == "rust" else detect_components
     timing = timings if timings is not None else {}
     t = perf_counter()
-    prepared = prepare(run, params)
+    # Review can reuse its own baseline when only detection settings change.
+    if _prepared is not None:
+        prepared = _prepared
+    elif engine == "rust":
+        prepared = prepare(run, params)
+    else:
+        prepared = prepare(run, params, noise=_noise)
     timing["preprocess_seconds"] = perf_counter() - t
     t = perf_counter()
     features, spectra = detect(run, prepared, params)
@@ -341,8 +358,12 @@ def analyze(
     if engine == "rust":
         reference, fractions, scores = rust_backend.project_match(run, library, spectra)
     else:
-        reference, fractions = library.project(run.mz)
-        scores = match_spectra(spectra, reference)
+        if _reference is None:
+            reference, fractions = library.project(run.mz)
+            normalized = normalize_spectra(reference)
+        else:
+            reference, fractions, normalized = _reference
+        scores = match_spectra(spectra, normalized, reference_normalized=True)
     timing["project_match_seconds"] = perf_counter() - t
     t = perf_counter()
     report = build_report(
@@ -369,4 +390,6 @@ def analyze(
             ).reshape(-1, 2),
             component_area=np.array([f.area for f in features]),
         )
+        if engine == "python":
+            arrays["reference_normalized"] = normalized
     return report
