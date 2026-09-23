@@ -34,6 +34,8 @@ to `127.0.0.1:8001` by default and returns `Server-Timing` and `Cache-Control: n
 | GET | `/v1/analyses/{id}` | Metadata, chromatogram and compact peak summaries |
 | GET | `/v1/analyses/{id}/components/{component_id}` | Original component, candidates, spectra and optional review annotation |
 | GET | `/v1/analyses/{id}/spectra?components=component-0001,component-0002` | Selected component spectra in retention-time order, without candidate/review payloads |
+| GET | `/v1/analyses/{id}/scans?time_seconds=2820` | Nearest raw scan (earlier scan on ties; endpoints outside the acquisition) |
+| GET | `/v1/analyses/{id}/scans?index=0` | Raw scan by zero-based acquisition index |
 
 
 ## Checks
@@ -46,3 +48,18 @@ python3 scripts/check_workspace.py artifacts/review-rust.json
 
 The HTTP check requires a running service and the imported report. It verifies
 every stored component, candidate, spectrum and review trace against the report.
+
+## Native raw scans
+
+Import the matching acquisition once, using the analysis ID returned by import:
+
+```sh
+services/rust/target/release/gcms-api import-scans <analysis-id> /path/to/sample.D/data.ms
+python3 scripts/check_workspace.py artifacts/review-rust.json --acquisition /path/to/sample.D/data.ms
+```
+
+The importer verifies the source SHA-256, scan count and time bounds, preserves
+native m/z and counts, and stores scans plus the complete raw TIC atomically.
+Repeated imports leave existing records unchanged. The overview includes
+`raw_chromatogram`; scan queries use indexed acquisition times or scan indices.
+No peak detection or identification is rerun.

@@ -1,8 +1,10 @@
 """Check a running Rust API against the exact saved report (no analysis rerun)."""
 
 import argparse
+import hashlib
 import json
 import statistics
+import struct
 import time
 from pathlib import Path
 from urllib.error import HTTPError
@@ -13,6 +15,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("report", type=Path)
     parser.add_argument("--url", default="http://127.0.0.1:8001")
+    parser.add_argument("--acquisition", type=Path, help="Check imported raw scans against data.ms")
     args = parser.parse_args()
     document = json.loads(args.report.read_text())
     report = document.get("analysis", document)
@@ -58,6 +61,39 @@ def main():
     request(f"{path}/spectra", status=400)
     request(f"{path}/spectra?components=invalid", status=400)
     request(f"{path}/spectra?components=component-9999", status=404)
+    for query in ("", "index=-1", "index=1.5", "time_seconds=NaN", "time_seconds=inf", "time_seconds=-1", "index=0&time_seconds=0"):
+        request(f"{path}/scans?{query}", status=400)
+    request(f"{path}/scans?index=2147483647", status=404)
+    if args.acquisition:
+        raw = args.acquisition.read_bytes()
+        assert hashlib.sha256(raw).hexdigest() == report["provenance"]["input_data_ms_sha256"]
+        trace = saved["raw_chromatogram"]
+        count = struct.unpack_from("<H", raw, 0x142)[0]
+        position = struct.unpack_from(">H", raw, 0x10A)[0] * 2 - 2
+        assert len(trace["time_seconds"]) == len(trace["raw_tic"]) == count
+        # Verify every native scan total; inspect exact spectra across the whole acquisition.
+        sampled = {0, 1, count-1, count-2, *(i*count//10 for i in range(1, 10))}
+        for index in range(count):
+            time_seconds = struct.unpack_from(">I", raw, position+2)[0] / 1000
+            pairs = struct.unpack_from(">H", raw, position+12)[0]
+            ions = {}
+            for mz, encoded in struct.iter_unpack(">HH", raw[position+18:position+18+pairs*4]):
+                mass = mz / 20
+                ions[mass] = ions.get(mass, 0) + (encoded & 0x3FFF) * 8**(encoded >> 14)
+            assert trace["time_seconds"][index] == time_seconds
+            assert trace["raw_tic"][index] == sum(ions.values())
+            if index in sampled:
+                scan = request(f"{path}/scans?index={index}")
+                assert scan == {"scan_index": index, "time_seconds": time_seconds,
+                                "spectrum": {"mz": sorted(ions), "intensity": [ions[m] for m in sorted(ions)]}}
+                assert request(f"{path}/scans?time_seconds={time_seconds}") == scan
+                if index+1<count:
+                    near = time_seconds+(trace["time_seconds"][index+1]-time_seconds)*0.49
+                    assert request(f"{path}/scans?time_seconds={near}") == scan
+            position += 28+pairs*4
+        assert request(f"{path}/scans?time_seconds=0")["scan_index"] == 0
+        assert request(f"{path}/scans?time_seconds=999999")["scan_index"] == count-1
+        print(f"Verified all {count} raw scan timestamps/totals and {len(sampled)} exact native spectra.")
     request("/v1/analyses/invalid", status=400)
     request("/v1/analyses/" + "0" * 64, status=404)
     request(f"{path}/components/invalid", status=400)
@@ -65,6 +101,8 @@ def main():
     request("/v1/analyses", status=405, method="POST")
     request("/v1/analyze", status=404, method="POST")
     routes = [path, f"{path}/components/{report['components'][0]['component_id']}", f"{path}/spectra?components={ids.split(',')[0]},{ids.split(',')[-1]}"]
+    if args.acquisition:
+        routes.append(f"{path}/scans?time_seconds=2820")
     for route in routes:
         times = []
         for _ in range(10):

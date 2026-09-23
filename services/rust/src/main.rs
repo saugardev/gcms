@@ -1,4 +1,5 @@
 mod import;
+mod scans;
 
 use axum::{
     Json, Router,
@@ -85,13 +86,13 @@ async fn analysis(State(pool): State<Pool>, Path(id): Path<String>) -> ApiResult
     let client = pool.get().await?;
     let row = client
         .query_opt(
-            "SELECT metadata, chromatogram, peaks, imported_at::text FROM analyses WHERE id = $1",
+            "SELECT a.metadata, a.chromatogram, a.peaks, a.imported_at::text, r.chromatogram FROM analyses a LEFT JOIN raw_acquisitions r ON r.analysis_id=a.id WHERE a.id = $1",
             &[&id],
         )
         .await?
         .ok_or(ApiError(StatusCode::NOT_FOUND, "Analysis not found."))?;
     Ok(Json(
-        json!({"id":id,"metadata":row.get::<_,Value>(0),"chromatogram":row.get::<_,Value>(1),"peaks":row.get::<_,Value>(2),"imported_at":row.get::<_,String>(3)}),
+        json!({"id":id,"metadata":row.get::<_,Value>(0),"chromatogram":row.get::<_,Value>(1),"peaks":row.get::<_,Value>(2),"imported_at":row.get::<_,String>(3),"raw_chromatogram":row.get::<_,Option<Value>>(4)}),
     ))
 }
 
@@ -157,6 +158,35 @@ async fn spectra(
     ))
 }
 
+async fn scan(
+    State(pool): State<Pool>,
+    Path(id): Path<String>,
+    Query(query): Query<HashMap<String, String>>,
+) -> ApiResult {
+    valid_id(&id)?;
+    let invalid = || {
+        ApiError(
+            StatusCode::BAD_REQUEST,
+            "Specify one nonnegative scan index or finite time_seconds.",
+        )
+    };
+    if query.len() != 1 {
+        return Err(invalid());
+    }
+    let client = pool.get().await?;
+    let row = if let Some(value) = query.get("index") {
+        let index = value.parse::<i32>().ok().filter(|v|*v>=0).ok_or_else(invalid)?;
+        client.query_opt("SELECT scan_index,time_seconds,spectrum FROM raw_scans WHERE analysis_id=$1 AND scan_index=$2", &[&id,&index]).await?
+    } else {
+        let time = query.get("time_seconds").and_then(|v|v.parse::<f64>().ok()).filter(|v|v.is_finite() && *v>=0.0).ok_or_else(invalid)?;
+        // Two indexed neighbors; never sort every scan to find the closest time.
+        client.query_opt("SELECT * FROM ((SELECT scan_index,time_seconds,spectrum FROM raw_scans WHERE analysis_id=$1 AND time_seconds <= $2 ORDER BY time_seconds DESC LIMIT 1) UNION ALL (SELECT scan_index,time_seconds,spectrum FROM raw_scans WHERE analysis_id=$1 AND time_seconds > $2 ORDER BY time_seconds LIMIT 1)) neighbors ORDER BY abs(time_seconds-$2),scan_index LIMIT 1", &[&id,&time]).await?
+    }.ok_or(ApiError(StatusCode::NOT_FOUND, "Raw scan not found. Import the matching acquisition first."))?;
+    Ok(Json(
+        json!({"scan_index":row.get::<_,i32>(0),"time_seconds":row.get::<_,f64>(1),"spectrum":row.get::<_,Value>(2)}),
+    ))
+}
+
 async fn import_file(pool: &Pool, path: &str) -> Result<(), Box<dyn Error>> {
     if std::fs::metadata(path)?.len() > 64 * 1024 * 1024 {
         return Err("Report exceeds 64 MiB".into());
@@ -186,14 +216,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().skip(1).collect();
     if !matches!(
         args.first().map(String::as_str),
-        Some("serve" | "migrate" | "import")
+        Some("serve" | "migrate" | "import" | "import-scans")
     ) || args.len()
         != match args.first().map(String::as_str) {
             Some("import") => 2,
+            Some("import-scans") => 3,
             _ => 1,
         }
     {
-        return Err("Usage: gcms-api migrate | import <saved-rust-report.json> | serve".into());
+        return Err("Usage: gcms-api migrate | import <saved-rust-report.json> | import-scans <analysis-id> <data.ms> | serve".into());
     }
     let mut config = Config::new();
     config.url =
@@ -213,6 +244,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
             println!("Database schema ready.");
         }
         "import" => import_file(&pool, &args[1]).await?,
+        "import-scans" => {
+            scans::import(&pool, &args[1], &args[2]).await?;
+        }
         _ => {
             // Fail startup if the database is unavailable or migrations have not run.
             pool.get()
@@ -225,6 +259,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 .route("/v1/analyses/{id}", get(analysis))
                 .route("/v1/analyses/{id}/components/{component}", get(component))
                 .route("/v1/analyses/{id}/spectra", get(spectra))
+                .route("/v1/analyses/{id}/scans", get(scan))
                 .fallback(|| async { ApiError(StatusCode::NOT_FOUND, "Endpoint not found.") })
                 .layer(middleware::from_fn(timing))
                 .with_state(pool);
