@@ -26,16 +26,16 @@ requires = ["hatchling==1.32.4"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["gcms/python/gcms"]
+packages = ["services/python/gcms"]
 
 [tool.hatch.build.targets.sdist]
-only-include = ["gcms/README.md", "gcms/python", "gcms/rust/src", "gcms/rust/Cargo.toml", "gcms/rust/Cargo.lock", "gcms/rust/build.rs", "tests", "scripts", "deploy", ".github/workflows", "rust-toolchain.toml", "pyproject.toml", "uv.lock", ".python-version", "README.md", "LICENSE", "docs", "examples"]
+only-include = ["services/README.md", "services/python", "services/rust/src", "services/rust/Cargo.toml", "services/rust/Cargo.lock", "services/rust/build.rs", "tests", "scripts", "deploy", ".github/workflows", "rust-toolchain.toml", "pyproject.toml", "uv.lock", ".python-version", "README.md", "LICENSE", "docs", "examples"]
 exclude = ["**/__pycache__", "**/.DS_Store", "examples/reproducibility.json"]
 
 [tool.ruff]
 target-version = "py311"
 line-length = 100
-src = ["gcms/python"]
+src = ["services/python"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]

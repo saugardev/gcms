@@ -168,7 +168,7 @@ repository root (tested with rustc 1.94.0 on macOS arm64):
 ```sh
 export GCMS_SAMPLE=/absolute/path/to/sample.D
 export GCMS_LIBRARY=/absolute/path/to/library.msp
-PYO3_PYTHON="$PWD/.venv/bin/python" cargo build --release --locked --manifest-path gcms/rust/Cargo.toml
+PYO3_PYTHON="$PWD/.venv/bin/python" cargo build --release --locked --manifest-path services/rust/Cargo.toml
 uv run --locked gcms analyze --engine rust --out artifacts/rust-sample
 uv run --locked gcms export-bundle --out artifacts/python
 uv run --locked gcms export-bundle --engine rust --out artifacts/rust
@@ -178,7 +178,7 @@ uv run --locked gcms benchmark --engine python --repeats 7 --out artifacts/pytho
 uv run --locked gcms benchmark --engine rust --repeats 7 --out artifacts/rust-benchmark.json
 ```
 
-The extension is loaded from `gcms/rust/target/release/`. Both macOS and Linux library
+The extension is loaded from `services/rust/target/release/`. Both macOS and Linux library
 names are supported; only macOS was measured here. Cargo.lock pins dependencies;
 builds use release optimization and thin LTO, without fast-math or extra threads.
 Rust compilation is excluded from execution timings. A missing build gives a
@@ -197,7 +197,7 @@ are skipped if the optional extension has not been built.
 Review checks also cover reciprocal correspondence, skipped/failed settings,
 plot-integral agreement, safe exports and complete real-sample review equivalence.
 
-Sources: [Rust kernels](../gcms/rust/src/lib.rs), [Python bridge](../gcms/python/gcms/rust_backend.py),
+Sources: [Rust kernels](../services/rust/src/lib.rs), [Python bridge](../services/python/gcms/rust_backend.py),
 [parity checks](../tests/test_rust.py). The bridge uses [PyO3](https://pyo3.rs/)
 and [rust-numpy](https://docs.rs/numpy/0.29.0/numpy/). Peak and convolution behavior
 follows the documented [SciPy peak routines](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html)
@@ -255,7 +255,7 @@ evidence.
 
 The original acquisition and library are external inputs and are not distributed.
 Recorded source paths refer to the layout used at measurement time; the current
-implementations live under `gcms/python` and `gcms/rust`.
+implementations live under `services/python` and `services/rust`.
 
 ## Earlier single-analysis comparison
 
@@ -393,7 +393,7 @@ Let S = scans, M = mass channels, G = exact reference groups and C = components.
 remaining arrays and report are expected outputs. Group/component ordering, zero
 handling, rounding, filter boundaries and stable ties matter. The exact processing
 rules are in [science.md](science.md#processing); the reference implementation is
-[pipeline.py](../gcms/python/gcms/pipeline.py). Input loading verifies hashes and rejects pickle.
+[pipeline.py](../services/python/gcms/pipeline.py). Input loading verifies hashes and rejects pickle.
 Large bundles are generated locally under `artifacts/`, not stored as sample results.
 
 ## Contract for further Rust migration

@@ -77,11 +77,11 @@ Each processing setting is an optional query parameter, for example
 Unknown keys and invalid combinations return `422`. The CLI accepts the same
 settings as a JSON object using `--params parameters.json`. Actual settings are
 always returned in the report. See [the algorithm specification](science.md#processing)
-for their meaning and [models.py](../gcms/python/gcms/models.py) for defaults and permitted bounds.
+for their meaning and [models.py](../services/python/gcms/models.py) for defaults and permitted bounds.
 
 ## Response contract
 
-The versioned report schema is defined in [models.py](../gcms/python/gcms/models.py), with a
+The versioned report schema is defined in [models.py](../services/python/gcms/models.py), with a
 complete [example](../examples/sample.json) and [OpenAPI export](../examples/openapi.json).
 All numeric times in JSON are **seconds**; HTML displays minutes. Masses are
 nominal m/z; intensities are uncalibrated instrument values.

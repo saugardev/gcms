@@ -90,7 +90,7 @@ function page(doc, action) { doc.querySelector(`[data-page="${action}"]`).click(
   frame.contentWindow.dispatchEvent(new Event('afterprint')); count(doc, 12, 2);
   page(doc, 'first'); count(doc, 12);
   check(!doc.getElementById('evidence-hint').hidden, 'Changing page clears previous selection');
-  const dashboard = await (await fetch('../gcms/python/gcms/dashboard.html')).text();
+  const dashboard = await (await fetch('../services/python/gcms/dashboard.html')).text();
   let request, fail = false, duration = '1234.000';
   window.dashboardFetch = async (url, options) => {
     request = {url, options};

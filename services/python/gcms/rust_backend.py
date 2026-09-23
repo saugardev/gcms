@@ -26,7 +26,7 @@ def native():
     if not path.exists():
         raise ProcessingError(
             "rust_not_built",
-            "Build first: PYO3_PYTHON=$(pwd)/.venv/bin/python cargo build --release --locked --manifest-path gcms/rust/Cargo.toml",
+            "Build first: PYO3_PYTHON=$(pwd)/.venv/bin/python cargo build --release --locked --manifest-path services/rust/Cargo.toml",
         )
     loader = importlib.machinery.ExtensionFileLoader("_gcms_rust", str(path))
     spec = importlib.util.spec_from_loader("_gcms_rust", loader)

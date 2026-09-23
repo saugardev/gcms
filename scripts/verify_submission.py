@@ -138,9 +138,9 @@ def main():
                 "docs/science.md",
                 "docs/benchmarks.md",
                 "docs/validation.md",
-                "gcms/README.md",
-                "gcms/python/gcms/__init__.py",
-                "gcms/rust/src/lib.rs",
+                "services/README.md",
+                "services/python/gcms/__init__.py",
+                "services/rust/src/lib.rs",
             }
             missing = required - evidence["file_sha256"].keys()
             if missing:
@@ -169,7 +169,7 @@ def main():
                     "--release",
                     "--locked",
                     "--manifest-path",
-                    "gcms/rust/Cargo.toml",
+                    "services/rust/Cargo.toml",
                 ],
                 clean,
             )

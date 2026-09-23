@@ -45,10 +45,10 @@ cd "$release"
 uv sync --locked
 export PYO3_PYTHON="$release/.venv/bin/python"
 # Force our crate to rebuild when its source directory changes; cache dependencies.
-cargo clean --release -p gcms-rust --manifest-path gcms/rust/Cargo.toml
-cargo build --release --locked --manifest-path gcms/rust/Cargo.toml
-mkdir -p gcms/rust/target/release
-install -m 755 "$CARGO_TARGET_DIR/release/lib_gcms_rust.so" gcms/rust/target/release/
+cargo clean --release -p gcms-rust --manifest-path services/rust/Cargo.toml
+cargo build --release --locked --manifest-path services/rust/Cargo.toml
+mkdir -p services/rust/target/release
+install -m 755 "$CARGO_TARGET_DIR/release/lib_gcms_rust.so" services/rust/target/release/
 export GCMS_LIBRARY="$root/data/library.msp" GCMS_SAMPLE="$root/data/sample.D"
 export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1
 .venv/bin/python -c 'from gcms.rust_backend import native; native()'

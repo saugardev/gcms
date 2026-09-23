@@ -65,7 +65,7 @@ ion traces and a per-peak correspondence table:
 
 ```sh
 uv run --locked gcms review --engine python --out artifacts/review-python
-PYO3_PYTHON="$PWD/.venv/bin/python" cargo build --release --locked --manifest-path gcms/rust/Cargo.toml
+PYO3_PYTHON="$PWD/.venv/bin/python" cargo build --release --locked --manifest-path services/rust/Cargo.toml
 uv run --locked gcms review --engine rust --out artifacts/review-rust
 uv run --locked gcms compare-reviews artifacts/review-python.json artifacts/review-rust.json
 ```

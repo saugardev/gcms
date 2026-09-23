@@ -40,7 +40,7 @@ Run `uv run --locked gcms evaluate --out artifacts/evaluation.json`.
 Add `--engine rust` to repeat the same protocol with native numerical kernels.
 All conditions, seeds, input-array/library hashes and individual results are in
 the [Python evaluation](../examples/evaluation.json) and [Rust evaluation](../examples/evaluation-rust.json).
-The full protocol is `synthetic-stress-1` in [evaluation.py](../gcms/python/gcms/evaluation.py).
+The full protocol is `synthetic-stress-1` in [evaluation.py](../services/python/gcms/evaluation.py).
 
 The protocol fixes the processing parameters before evaluating 16 scenarios,
 each with three seeds (17, 29, 43):

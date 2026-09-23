@@ -1,1 +1,15 @@
 *.rar
+.DS_Store
+.local/
+.venv/
+__pycache__/
+.ruff_cache/
+artifacts/
+**/target/
+**/node_modules/
+**/.next/
+**/*.tsbuildinfo
+.env
+.env.*
+!.env.example
+!**/.env.example
