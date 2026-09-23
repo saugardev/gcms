@@ -41,6 +41,7 @@ export type Analysis = {
     sample_name: string;
     warnings: string[];
     algorithm_version: string;
+    parameters?: { ambiguity_margin?: number };
     acquisition: {
       scan_count: number;
       start_seconds: number;
@@ -68,6 +69,8 @@ export type ComponentDetail = {
     area: number;
     area_percent: number;
     status: string;
+    score_margin?: number | null;
+    close_candidate_groups?: number;
     warnings: string[];
     spectrum: Spectrum;
     candidates: Candidate[];

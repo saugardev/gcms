@@ -11,6 +11,7 @@ import {
 import { Chromatogram } from "./plots";
 import { CardInfo } from "./card-info";
 import { SpectrumPanel, type SpectrumView } from "./spectrum-panel";
+import { ambiguityReasons } from "@/lib/assignments";
 import {
   ResultGuide,
   ResultLabel,
@@ -463,11 +464,11 @@ export default function Workspace() {
                   ))}
                 </select>
                 <select
-                  aria-label="Filter by processing stability"
+                  aria-label="Filter by robustness"
                   value={stability}
                   onChange={(event) => setStability(event.target.value)}
                 >
-                  <option value="all">All stability</option>
+                  <option value="all">Robustness: all</option>
                   {Object.keys(stabilityLabels).map((value) => (
                     <option key={value} value={value}>
                       {human(value)} (
@@ -683,7 +684,7 @@ export default function Workspace() {
                       </span>
                       {detail.review && (
                         <span>
-                          Processing stability{" "}
+                          Robustness{" "}
                           <ResultLabel
                             value={detail.review.label}
                             kind="stability"
@@ -691,6 +692,15 @@ export default function Workspace() {
                         </span>
                       )}
                     </div>
+                    {detail.component.status === "ambiguous" && (
+                      <section className="assignment-reason" aria-labelledby="ambiguity-title">
+                        <h3 id="ambiguity-title">Why ambiguous?</h3>
+                        {ambiguityReasons(
+                          detail.component,
+                          analysis.metadata.parameters?.ambiguity_margin,
+                        ).map((reason) => <p key={reason}>{reason}</p>)}
+                      </section>
+                    )}
                     {detail.component.candidates.length ? (
                       <ol className="candidate-list">
                         {detail.component.candidates.map((c, index) => (

@@ -13,7 +13,7 @@ export const stabilityLabels: Record<string, string> = {
   sensitive:
     "At least one processing variation changed the leading reference group or could no longer match the component.",
   inconclusive:
-    "Incomplete checks or uncertain correspondence prevented a clear stability result.",
+    "Incomplete checks or uncertain correspondence prevented a clear robustness result.",
 };
 
 export function ResultLabel({
@@ -31,7 +31,7 @@ export function ResultLabel({
       type="button"
       className={`result-label ${kind}`}
       title={description}
-      aria-label={`${kind === "assignment" ? "Assignment" : "Processing stability"}: ${value}. Show explanation`}
+      aria-label={`${kind === "assignment" ? "Assignment" : "Robustness"}: ${value}. Show explanation`}
       popoverTarget="result-guide"
       onClick={(event) => event.stopPropagation()}
     >
@@ -76,7 +76,7 @@ export function ResultGuide() {
           </dl>
         </section>
         <section>
-          <h3>Processing stability</h3>
+          <h3>Robustness</h3>
           <p>Does the result persist when processing settings change?</p>
           <dl>
             {Object.entries(stabilityLabels).map(([label, description]) => (

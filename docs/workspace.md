@@ -93,10 +93,13 @@ The existing live Python deployment is a separate application.
   a range. Switch to Zoom mode to magnify a region. Pan, focus the selected peak
   or group, or reset the chromatogram. Focusing a reviewed component uses its saved detailed peak trace;
   the overview uses the saved preview. Raw and corrected traces can be compared.
-- Search names, CAS numbers or component IDs; filter assignment and processing
-  stability together, and sort by retention time, area or similarity. Click an
-  assignment/stability badge or “Labels & shortcuts” for explanations. These
+- Search names, CAS numbers or component IDs; filter assignment and robustness
+  across processing settings together, and sort by retention time, area or similarity. Click an
+  assignment/robustness badge or “Labels & shortcuts” for explanations. These
   controls inspect and filter saved labels; they do not change analysis results.
+- Ambiguous components show “Why ambiguous?” above their candidates, using the
+  saved warning flags, close-match count, score gap and ambiguity margin. Conflicting
+  reference identities are explained separately. Missing reasons are reported explicitly.
 - Select a library candidate to change the lower half of the mirrored spectrum.
   Component and reference intensities are independently normalized to 100%.
 - Drag across a mass spectrum to zoom m/z in all comparison lanes together.
