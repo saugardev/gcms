@@ -1,5 +1,8 @@
 # HTTP API
 
+For the new Rust/PostgreSQL read API, see [workspace.md](workspace.md). The
+endpoints below belong to the existing Python processing API.
+
 [Documentation](README.md) · [Scientific method](science.md) · [OpenAPI](../examples/openapi.json)
 
 Run the commands below from the repository root after `uv sync --locked`.

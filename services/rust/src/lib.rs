@@ -1,3 +1,5 @@
+#![cfg(feature = "python")]
+
 //! Single-threaded float64 kernels for coapex-1; Python owns ingestion and reports.
 use numpy::{IntoPyArray, PyArray1, PyArray2, PyReadonlyArray1, PyReadonlyArray2, ndarray::Array2};
 use pyo3::{exceptions::PyValueError, prelude::*};

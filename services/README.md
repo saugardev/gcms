@@ -1,7 +1,13 @@
 # Implementations
 
 - [python/gcms](python/gcms/): API, CLI, input validation, reports and NumPy/SciPy baseline.
-- [rust](rust/): optional numerical kernels loaded by the Python application.
+- [rust](rust/): standalone Rust/PostgreSQL read API and saved-report importer,
+  plus optional numerical kernels loaded by Python.
+
+[Workspace setup and read API](../docs/workspace.md). Python packaging remains
+at the repository root; Python source is under `python/gcms/`.
+
+## Existing numerical engines
 
 Rust was faster here because its compiled peak-processing loops stop searching
 at zero background and skip exact-zero spectral products. Both engines reuse
