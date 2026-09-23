@@ -6,6 +6,7 @@ import type {
   ComponentDetail,
   Peak,
   Spectrum,
+  IonTrace,
 } from "@/lib/api";
 import {
   constrainRange,
@@ -39,6 +40,13 @@ export function Chromatogram({
   onSelectRange,
   onScan,
   scanTime,
+  ionMz,
+  ionTolerance,
+  ionTrace,
+  ionError,
+  onIonTolerance,
+  onClearIon,
+  onRetryIon,
 }: {
   analysis: Analysis;
   selected?: Peak;
@@ -48,6 +56,13 @@ export function Chromatogram({
   onSelectRange: (ids: string[], additive: boolean) => void;
   onScan: (time: number) => void;
   scanTime?: number;
+  ionMz: number | null;
+  ionTolerance: number;
+  ionTrace: IonTrace | null;
+  ionError: string;
+  onIonTolerance: (value: number) => void;
+  onClearIon: () => void;
+  onRetryIon: () => void;
 }) {
   const { ref, width } = useWidth();
   const clip = useId();
@@ -83,7 +98,7 @@ export function Chromatogram({
   const [drag, setDrag] = useState<Range | null>(null);
   const origin = useRef<number | null>(null);
   const w = width - 66,
-    h = 224,
+    h = ionMz === null ? 224 : 188,
     left = 53,
     top = 17;
   const span = range[1] - range[0];
@@ -92,6 +107,7 @@ export function Chromatogram({
   for (const [times, values, visible] of [
     [rawTrace.time_seconds, rawTrace.raw_tic, raw],
     [trace.time_seconds, trace.corrected_tic, corrected],
+    [rawTrace.time_seconds, ionTrace?.intensity ?? [], !!ionTrace],
   ] as const) {
     if (!visible) continue;
     for (
@@ -123,10 +139,12 @@ export function Chromatogram({
       ),
     );
   const hoverTimes =
-    raw ? rawTrace.time_seconds : trace.time_seconds;
+    raw || !corrected ? rawTrace.time_seconds : trace.time_seconds;
   const hoverValues = raw
     ? rawTrace.raw_tic
-    : trace.corrected_tic;
+    : corrected
+      ? trace.corrected_tic
+      : (ionTrace?.intensity ?? []);
   const hoveredIndex = hover === null ? -1 : nearestIndex(hoverTimes, hover);
   return (
     <section className="panel chromatogram-panel" aria-labelledby="tic-title">
@@ -183,7 +201,7 @@ export function Chromatogram({
               checked={raw}
               onChange={(e) => {
                 setRaw(e.target.checked);
-                if (!e.target.checked) setCorrected(true);
+                if (!e.target.checked && ionMz === null) setCorrected(true);
               }}
             />
             <span className="swatch measured" />
@@ -195,7 +213,7 @@ export function Chromatogram({
               checked={corrected}
               onChange={(e) => {
                 setCorrected(e.target.checked);
-                if (!e.target.checked) setRaw(true);
+                if (!e.target.checked && ionMz === null) setRaw(true);
               }}
             />
             <span className="swatch reference" />
@@ -279,6 +297,46 @@ export function Chromatogram({
           </button>
         </div>
       </div>
+      {ionMz !== null && (
+        <div className="ion-controls" aria-live="polite">
+          <span className="ion-name">
+            <i className="swatch ion-swatch" />
+            EIC m/z {Number(ionMz.toFixed(2))}
+          </span>
+          <label>
+            ±{" "}
+            <select
+              aria-label="Ion mass tolerance"
+              value={ionTolerance}
+              onChange={(event) => onIonTolerance(Number(event.target.value))}
+            >
+              {[0, 0.05, 0.1, 0.25, 0.5, 1, 2, 5].map((value) => (
+                <option key={value} value={value}>
+                  {value} Da
+                </option>
+              ))}
+            </select>
+          </label>
+          {ionError ? (
+            <button onClick={onRetryIon} title={ionError}>
+              Retry ion
+            </button>
+          ) : !ionTrace ? (
+            <span>Loading…</span>
+          ) : (
+            <span className="ion-scale-note">Same count scale</span>
+          )}
+          <button
+            aria-label="Clear extracted ion"
+            onClick={() => {
+              onClearIon();
+              if (!raw && !corrected) setRaw(true);
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
       <div className="plot" ref={ref}>
         <svg
           width={width}
@@ -376,6 +434,46 @@ export function Chromatogram({
                   )}
                 />
               )}
+              {ionTrace && (
+                <path
+                  className="ion-line"
+                  d={linePath(
+                    rawTrace.time_seconds,
+                    ionTrace.intensity,
+                    range,
+                    w,
+                    h,
+                    maximum,
+                  )}
+                />
+              )}
+              {analysis.peaks
+                .filter(
+                  (p) =>
+                    p.apex_seconds >= range[0] && p.apex_seconds <= range[1],
+                )
+                .map((p) => (
+                  <line
+                    key={p.component_id}
+                    className={
+                      selectedIds.has(p.component_id)
+                        ? "active-peak-line"
+                        : "peak-tick"
+                    }
+                    x1={x(p.apex_seconds)}
+                    x2={x(p.apex_seconds)}
+                    y1={h - 5}
+                    y2={h}
+                  />
+                ))}
+              {hover !== null && (
+                <line
+                  className="crosshair"
+                  x1={x(hover)}
+                  x2={x(hover)}
+                  y2={h}
+                />
+              )}
               {scanTime !== undefined && (
                 <line
                   className="scan-line"
@@ -471,12 +569,18 @@ export function Chromatogram({
       </div>
       <div className="plot-caption">
         <span>
-          {hoveredIndex >= 0
-            ? `${(hoverTimes[hoveredIndex] / 60).toFixed(3)} min · ${(hoverValues[hoveredIndex] ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} counts`
+          {!raw && !corrected && !ionTrace
+            ? ionError
+              ? "Ion trace unavailable"
+              : "Loading ion trace…"
+            : hoveredIndex >= 0
+            ? `${(hoverTimes[hoveredIndex] / 60).toFixed(3)} min · ${(hoverValues[hoveredIndex] ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} counts${ionTrace && (raw || corrected) ? ` · ion ${ionTrace.intensity[nearestIndex(rawTrace.time_seconds, hover!)]?.toLocaleString()} counts` : ""}`
             : `Intensity · maximum ${maximum.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
         </span>
         <span>
-          {raw && analysis.raw_chromatogram
+          {!raw && !corrected && ionMz !== null
+            ? "Full ion trace"
+            : raw && analysis.raw_chromatogram
             ? corrected
               ? "Full raw · saved corrected"
               : "Full raw trace"
@@ -500,6 +604,9 @@ export function MassSpectrum({
   showCounts = false,
   activeId,
   onActivate,
+  onIonSelect,
+  ionMz,
+  ionTolerance = 0.5,
 }: {
   series: SpectrumSeries[];
   massRange: Range;
@@ -507,6 +614,9 @@ export function MassSpectrum({
   showCounts?: boolean;
   activeId?: string;
   onActivate?: (id: string) => void;
+  onIonSelect?: (mz: number) => void;
+  ionMz?: number | null;
+  ionTolerance?: number;
 }) {
   const { ref, width } = useWidth();
   const clip = useId();
@@ -588,6 +698,18 @@ export function MassSpectrum({
             </g>
           ))}
           <g clipPath={`url(#${plotId})`}>
+            {onIonSelect && ionMz != null && (
+              <rect
+                className="selection-band"
+                x={x(ionMz - ionTolerance)}
+                width={Math.max(
+                  2,
+                  x(ionMz + ionTolerance) - x(ionMz - ionTolerance),
+                )}
+                y={12}
+                height={bottom - 12}
+              />
+            )}
             {items.map((item, itemIndex) => {
               const max = Math.max(1, ...item.spectrum.intensity);
               const direction = mirror && itemIndex === 1 ? 1 : -1;
@@ -721,6 +843,9 @@ export function MassSpectrum({
                 setRange(
                   constrainRange([center - size / 2, center + size / 2], full),
                 );
+              } else if (onIonSelect) {
+                const index = nearestIndex(items[0].spectrum.mz, end);
+                if (index >= 0) onIonSelect(items[0].spectrum.mz[index]);
               } else if (onActivate) {
                 onActivate(items[0].id);
               }

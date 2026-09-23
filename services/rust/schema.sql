@@ -30,3 +30,10 @@ CREATE TABLE IF NOT EXISTS raw_scans (
     PRIMARY KEY (analysis_id, scan_index)
 );
 CREATE UNIQUE INDEX IF NOT EXISTS raw_scans_time ON raw_scans (analysis_id, time_seconds);
+
+CREATE TABLE IF NOT EXISTS raw_ion_traces (
+    analysis_id text NOT NULL REFERENCES raw_acquisitions(analysis_id) ON DELETE CASCADE,
+    mass_key integer NOT NULL CHECK (mass_key BETWEEN 0 AND 65535),
+    points jsonb NOT NULL,
+    PRIMARY KEY (analysis_id, mass_key)
+);

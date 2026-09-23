@@ -1222,3 +1222,77 @@ summary {
   align-items: center;
   gap: 4px;
 }
+.ion-line {
+  stroke: var(--accent-ink);
+  stroke-width: 1.8;
+  fill: none;
+}
+.ion-swatch {
+  background: var(--accent-ink);
+}
+.ion-controls,
+.ion-extract {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px 7px;
+  min-height: 36px;
+  font-size: 11px;
+}
+.ion-controls {
+  color: var(--accent-ink);
+}
+.ion-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.ion-controls label {
+  white-space: nowrap;
+}
+.ion-controls select,
+.ion-controls button,
+.ion-extract input,
+.ion-extract button {
+  min-height: 28px;
+  padding: 3px 6px;
+  font-size: 11px;
+}
+.ion-controls select {
+  width: 75px;
+}
+.ion-controls button[aria-label] {
+  margin-left: auto;
+  min-width: 28px;
+  font-size: 17px;
+}
+.ion-scale-note,
+.ion-extract span {
+  color: var(--muted);
+  font-size: 10px;
+}
+.ion-extract input {
+  width: 75px;
+  min-width: 0;
+}
+.ion-extract label {
+  white-space: nowrap;
+}
+@media (max-width: 1100px) {
+  .ion-scale-note {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .ion-controls select,
+  .ion-controls button,
+  .ion-extract input,
+  .ion-extract button {
+    min-height: 40px;
+  }
+  .ion-controls {
+    min-height: 48px;
+  }
+}

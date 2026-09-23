@@ -9,6 +9,86 @@ pub struct Scan {
     pub total: u64,
 }
 
+pub fn mass_window(mz: f64, tolerance: f64) -> Option<(i32, i32)> {
+    if !mz.is_finite()
+        || !tolerance.is_finite()
+        || !(0.0..=3276.75).contains(&mz)
+        || !(0.0..=5.0).contains(&tolerance)
+    {
+        return None;
+    }
+    // Native masses are integer twentieths of a Da. Keep decimal boundary ions inclusive.
+    Some((
+        ((mz - tolerance) * 20.0 - 1e-7).ceil() as i32,
+        ((mz + tolerance) * 20.0 + 1e-7).floor() as i32,
+    ))
+}
+
+pub async fn index_ions(pool: &Pool, id: &str) -> Result<(), Box<dyn Error>> {
+    let mut client = pool.get().await?;
+    let tx = client.transaction().await?;
+    tx.query_opt(
+        "SELECT analysis_id FROM raw_acquisitions WHERE analysis_id=$1 FOR UPDATE",
+        &[&id],
+    )
+    .await?
+    .ok_or("Import the raw acquisition first")?;
+    if tx
+        .query_opt(
+            "SELECT mass_key FROM raw_ion_traces WHERE analysis_id=$1 LIMIT 1",
+            &[&id],
+        )
+        .await?
+        .is_some()
+    {
+        println!("{}", json!({"id":id,"ions_indexed":false}));
+        return Ok(());
+    }
+    let rows = tx
+        .query(
+            "SELECT scan_index,spectrum FROM raw_scans WHERE analysis_id=$1 ORDER BY scan_index",
+            &[&id],
+        )
+        .await?;
+    let mut traces = BTreeMap::<i32, Vec<(i32, u64)>>::new();
+    for row in rows {
+        let index: i32 = row.get(0);
+        let spectrum: Value = row.get(1);
+        let masses = spectrum["mz"].as_array().ok_or("Invalid stored spectrum")?;
+        let intensities = spectrum["intensity"]
+            .as_array()
+            .ok_or("Invalid stored spectrum")?;
+        if masses.len() != intensities.len() {
+            return Err("Mismatched stored spectrum arrays".into());
+        }
+        for (mz, intensity) in masses.iter().zip(intensities) {
+            let mass = mz
+                .as_f64()
+                .filter(|m| m.is_finite() && (0.0..=3276.75).contains(m))
+                .ok_or("Invalid stored mass")?;
+            let intensity = intensity.as_u64().ok_or("Invalid stored ion count")?;
+            if intensity > 0 {
+                traces
+                    .entry((mass * 20.0).round() as i32)
+                    .or_default()
+                    .push((index, intensity));
+            }
+        }
+    }
+    let statement = tx
+        .prepare("INSERT INTO raw_ion_traces (analysis_id,mass_key,points) VALUES ($1,$2,$3)")
+        .await?;
+    for (mass, points) in &traces {
+        tx.execute(&statement, &[&id, mass, &json!(points)]).await?;
+    }
+    tx.commit().await?;
+    println!(
+        "{}",
+        json!({"id":id,"ions_indexed":true,"mass_channels":traces.len()})
+    );
+    Ok(())
+}
+
 // Same complete ChemStation GC/MS layout validated by services/python/gcms/io.py.
 // Preserve native m/z values (1/20 Da); no binning, smoothing or peak detection.
 pub fn decode(raw: &[u8]) -> Result<Vec<Scan>, &'static str> {
@@ -132,6 +212,13 @@ mod tests {
 
     #[test]
     fn raw_scans_preserve_native_masses_and_validate_complete_records() {
+        assert_eq!(mass_window(43.05, 0.1), Some((859, 863)));
+        assert_eq!(mass_window(43.05, 0.0), Some((861, 861)));
+        assert_eq!(mass_window(43.051, 0.0), Some((862, 861)));
+        assert!(mass_window(f64::NAN, 0.5).is_none());
+        assert!(mass_window(43.0, f64::INFINITY).is_none());
+        assert!(mass_window(-1.0, 0.5).is_none());
+        assert!(mass_window(43.0, 5.1).is_none());
         let mut raw = vec![0; 0x144];
         raw[..4].copy_from_slice(&[1, 0x32, 0, 0]);
         raw[4] = 17;

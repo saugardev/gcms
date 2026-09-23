@@ -1,4 +1,5 @@
 export type Spectrum = { mz: number[]; intensity: number[] };
+export type IonTrace = { mz: number; tolerance: number; intensity: number[] };
 export type ComponentSpectrum = {
   component_id: string;
   apex_seconds: number;

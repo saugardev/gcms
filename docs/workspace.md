@@ -53,8 +53,12 @@ Run commands from the repository root.
 
    This Rust command checks the file's SHA-256 against the saved report, then
    stores native m/z/intensity pairs and the full raw TIC atomically in PostgreSQL.
+   It also indexes sparse ion traces by native mass for fast chromatogram reads.
    It does not rerun peak detection, matching or stability checks. Repeated imports
    leave the stored data unchanged. Missing acquisitions leave Scan controls disabled.
+   For scans imported before ion extraction was added, run `migrate`, then
+   `services/rust/target/release/gcms-api index-ions <analysis-id>` once. This reads
+   the stored scans directly from PostgreSQL and needs no acquisition file.
 3. In a second terminal:
 
    ```sh
@@ -103,6 +107,11 @@ The existing live Python deployment is a separate application.
   previous/next scan buttons and a retention-time input. Raw spectra preserve native
   mass values (1/20 Da), include background and are separate from reconstructed
   component spectra. The candidates panel identifies the component it belongs to.
+- Click an ion in the raw spectrum, or enter its m/z, to overlay its extracted ion
+  chromatogram (EIC). The ± tolerance selects an inclusive mass window (default
+  0.5 Da; 0 selects the exact native mass). Counts are summed from stored ion traces
+  on the same scale as the TIC. Hide Raw TIC to inspect the ion alone; × clears it.
+  Selecting an ion does not change the active component or identify a compound.
 - Reload sample makes fresh HTTP reads. The small time beside it measures the
   analysis response, including transfer and JSON parsing, not processing time.
 
@@ -123,6 +132,7 @@ percentages retain the original scientific limitations in [science.md](science.m
 | GET | `/v1/analyses/{id}/spectra?components=component-0001,component-0002` | Selected component spectra in retention-time order, without candidate/review payloads |
 | GET | `/v1/analyses/{id}/scans?time_seconds=2820` | Nearest raw scan (earlier scan on ties; endpoints outside the acquisition) |
 | GET | `/v1/analyses/{id}/scans?index=0` | Raw scan by zero-based acquisition index |
+| GET | `/v1/analyses/{id}/ions?mz=83&tolerance=0.5` | Ion counts for every raw scan within m/z ± tolerance (0–5 Da; default 0.5) |
 
 IDs are SHA-256 hashes of the canonical saved report. The database stores large
 component details separately, so opening a sample does not download every
@@ -130,7 +140,9 @@ spectrum. Component details are fetched once per selection and cached in the
 browser until reload. The API always queries PostgreSQL; it has no file fallback
 or processing endpoint. Overview responses also contain `raw_chromatogram` (null
 until imported). Comparison spectra use one batch query. Raw time lookup uses
-indexed neighbors rather than scanning the acquisition.
+indexed neighbors rather than scanning the acquisition. Ion extraction reads only
+the indexed mass channels in the requested window, returning zero for scans with
+no matching ions; it returns 409 if ion traces have not been indexed.
 Responses include `Server-Timing: db_api;dur=…` in
 milliseconds and `Cache-Control: no-store`. Invalid IDs return 400, missing records
 404, and database failures 503. Migrations/import are CLI commands only.
@@ -150,5 +162,7 @@ The final check requires the imported sample and running Rust API. It compares
 every stored component, candidate spectrum and review trace to the saved report,
 checks batch comparison, read-only routes and errors, and measures ten local reads
 per endpoint. Optional `--acquisition` verifies every raw timestamp and total ion
-count, plus exact spectra and nearest-time lookup across the acquisition.
+count, plus exact spectra and nearest-time lookup across the acquisition. It also
+compares four full ion chromatograms, including exact masses, tolerance boundaries
+and absent ions, against the acquisition.
 No analysis is rerun. Keep the PostgreSQL data volume to retain imported results.

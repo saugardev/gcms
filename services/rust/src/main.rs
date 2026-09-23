@@ -187,6 +187,63 @@ async fn scan(
     ))
 }
 
+async fn ion_trace(
+    State(pool): State<Pool>,
+    Path(id): Path<String>,
+    Query(query): Query<HashMap<String, String>>,
+) -> ApiResult {
+    valid_id(&id)?;
+    let invalid = || {
+        ApiError(
+            StatusCode::BAD_REQUEST,
+            "Specify m/z from 0 to 3276.75 and tolerance from 0 to 5 Da.",
+        )
+    };
+    let mz = query
+        .get("mz")
+        .and_then(|v| v.parse::<f64>().ok())
+        .ok_or_else(invalid)?;
+    let tolerance = query
+        .get("tolerance")
+        .map(|v| v.parse::<f64>())
+        .transpose()
+        .map_err(|_| invalid())?
+        .unwrap_or(0.5);
+    let (low, high) = scans::mass_window(mz, tolerance).ok_or_else(invalid)?;
+    let client = pool.get().await?;
+    let row = client.query_opt("SELECT jsonb_array_length(chromatogram->'time_seconds'), EXISTS(SELECT 1 FROM raw_ion_traces WHERE analysis_id=$1) FROM raw_acquisitions WHERE analysis_id=$1", &[&id]).await?.ok_or(ApiError(StatusCode::NOT_FOUND,"Raw acquisition not found."))?;
+    if !row.get::<_, bool>(1) {
+        return Err(ApiError(
+            StatusCode::CONFLICT,
+            "Index the stored ions before extracting a chromatogram.",
+        ));
+    }
+    let mut intensity = vec![0_u64; row.get::<_, i32>(0) as usize];
+    let rows = client
+        .query(
+            "SELECT points FROM raw_ion_traces WHERE analysis_id=$1 AND mass_key BETWEEN $2 AND $3",
+            &[&id, &low, &high],
+        )
+        .await?;
+    let corrupt = || {
+        ApiError(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "The stored ion trace is invalid.",
+        )
+    };
+    for row in rows {
+        let points: Vec<(usize, u64)> =
+            serde_json::from_value(row.get::<_, Value>(0)).map_err(|_| corrupt())?;
+        for (index, value) in points {
+            let target = intensity.get_mut(index).ok_or_else(corrupt)?;
+            *target = target.checked_add(value).ok_or_else(corrupt)?;
+        }
+    }
+    Ok(Json(
+        json!({"mz":mz,"tolerance":tolerance,"intensity":intensity}),
+    ))
+}
+
 async fn import_file(pool: &Pool, path: &str) -> Result<(), Box<dyn Error>> {
     if std::fs::metadata(path)?.len() > 64 * 1024 * 1024 {
         return Err("Report exceeds 64 MiB".into());
@@ -216,15 +273,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().skip(1).collect();
     if !matches!(
         args.first().map(String::as_str),
-        Some("serve" | "migrate" | "import" | "import-scans")
+        Some("serve" | "migrate" | "import" | "import-scans" | "index-ions")
     ) || args.len()
         != match args.first().map(String::as_str) {
-            Some("import") => 2,
+            Some("import" | "index-ions") => 2,
             Some("import-scans") => 3,
             _ => 1,
         }
     {
-        return Err("Usage: gcms-api migrate | import <saved-rust-report.json> | import-scans <analysis-id> <data.ms> | serve".into());
+        return Err("Usage: gcms-api migrate | import <saved-rust-report.json> | import-scans <analysis-id> <data.ms> | index-ions <analysis-id> | serve".into());
     }
     let mut config = Config::new();
     config.url =
@@ -246,7 +303,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
         "import" => import_file(&pool, &args[1]).await?,
         "import-scans" => {
             scans::import(&pool, &args[1], &args[2]).await?;
+            scans::index_ions(&pool, &args[1]).await?;
         }
+        "index-ions" => scans::index_ions(&pool, &args[1]).await?,
         _ => {
             // Fail startup if the database is unavailable or migrations have not run.
             pool.get()
@@ -260,6 +319,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 .route("/v1/analyses/{id}/components/{component}", get(component))
                 .route("/v1/analyses/{id}/spectra", get(spectra))
                 .route("/v1/analyses/{id}/scans", get(scan))
+                .route("/v1/analyses/{id}/ions", get(ion_trace))
                 .fallback(|| async { ApiError(StatusCode::NOT_FOUND, "Endpoint not found.") })
                 .layer(middleware::from_fn(timing))
                 .with_state(pool);

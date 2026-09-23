@@ -6,6 +6,7 @@ import {
   type Analysis,
   type AnalysisSummary,
   type ComponentDetail,
+  type IonTrace,
 } from "@/lib/api";
 import { Chromatogram } from "./plots";
 import { SpectrumPanel, type SpectrumView } from "./spectrum-panel";
@@ -35,6 +36,11 @@ export default function Workspace() {
   const [spectrumView, setSpectrumView] = useState<SpectrumView>("library");
   const [scanTarget, setScanTarget] = useState("index=0");
   const [scanTime, setScanTime] = useState<number | undefined>();
+  const [ionMz, setIonMz] = useState<number | null>(null);
+  const [ionTolerance, setIonTolerance] = useState(0.5);
+  const [ionTrace, setIonTrace] = useState<IonTrace | null>(null);
+  const [ionError, setIonError] = useState("");
+  const [ionRetry, setIonRetry] = useState(0);
   useEffect(() => {
     setSpectrumView(selection.ids.length > 1 ? "compare" : "library");
   }, [selection]);
@@ -88,6 +94,8 @@ export default function Workspace() {
     setStability("all");
     setScanTarget("index=0");
     setScanTime(undefined);
+    setIonMz(null);
+    setIonTrace(null);
     fetchSaved<Analysis>(
       `/analyses/${encodeURIComponent(analysisId)}`,
       controller.signal,
@@ -114,6 +122,30 @@ export default function Workspace() {
       });
     return () => controller.abort();
   }, [analysisId, retry]);
+
+  useEffect(() => {
+    setIonTrace(null);
+    setIonError("");
+    if (!analysis || ionMz === null) return;
+    const controller = new AbortController();
+    fetchSaved<IonTrace>(
+      `/analyses/${analysis.id}/ions?mz=${ionMz}&tolerance=${ionTolerance}`,
+      controller.signal,
+    )
+      .then((trace) => {
+        if (controller.signal.aborted) return;
+        if (
+          trace.intensity.length !==
+          analysis.raw_chromatogram?.time_seconds.length
+        )
+          throw new Error("The ion trace does not match this acquisition.");
+        setIonTrace(trace);
+      })
+      .catch((error) => {
+        if (!controller.signal.aborted) setIonError(error.message);
+      });
+    return () => controller.abort();
+  }, [analysis, ionMz, ionTolerance, ionRetry]);
 
   useEffect(() => {
     if (!analysis) return;
@@ -325,6 +357,17 @@ export default function Workspace() {
                 setSpectrumView("raw");
               }}
               scanTime={spectrumView === "raw" ? scanTime : undefined}
+              ionMz={ionMz}
+              ionTolerance={ionTolerance}
+              ionTrace={
+                ionTrace?.mz === ionMz && ionTrace?.tolerance === ionTolerance
+                  ? ionTrace
+                  : null
+              }
+              ionError={ionError}
+              onIonTolerance={setIonTolerance}
+              onClearIon={() => setIonMz(null)}
+              onRetryIon={() => setIonRetry((n) => n + 1)}
               onSelectRange={(ids, additive) =>
                 setSelection((current) => selectRange(current, ids, additive))
               }
@@ -346,6 +389,9 @@ export default function Workspace() {
               scanTarget={scanTarget}
               onScanTarget={setScanTarget}
               onScanLoaded={setScanTime}
+              ionMz={ionMz}
+              ionTolerance={ionTolerance}
+              onIonSelect={setIonMz}
               onActivate={(id) =>
                 setSelection((current) => ({ ...current, active: id }))
               }

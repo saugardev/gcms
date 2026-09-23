@@ -107,6 +107,12 @@ export function ResultGuide() {
           Scan mode shows the raw acquisition spectrum at any time. Use the scan
           arrows or enter a retention time to move precisely.
         </p>
+        <p>
+          Click an ion in the raw spectrum, or enter its m/z, to show its
+          chromatogram. Adjust the ± mass tolerance beside the trace; hide Raw
+          TIC to focus on the ion signal. Selecting an ion keeps the active
+          component and its candidates unchanged.
+        </p>
       </section>
       <p className="guide-note">
         Drag within a mass spectrum to zoom the shared m/z range. Each spectrum

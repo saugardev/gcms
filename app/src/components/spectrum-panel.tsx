@@ -27,6 +27,9 @@ export function SpectrumPanel({
   onScanTarget,
   onScanLoaded,
   onActivate,
+  ionMz,
+  ionTolerance,
+  onIonSelect,
 }: {
   analysis: Analysis;
   selectedIds: string[];
@@ -41,6 +44,9 @@ export function SpectrumPanel({
   onScanTarget: (target: string) => void;
   onScanLoaded: (time: number) => void;
   onActivate: (id: string) => void;
+  ionMz: number | null;
+  ionTolerance: number;
+  onIonSelect: (mz: number) => void;
 }) {
   const [comparison, setComparison] = useState<{
     key: string;
@@ -213,6 +219,33 @@ export function SpectrumPanel({
           <button type="submit">Go</button>
         </form>
       )}
+      {view === "raw" && (
+        <form
+          className="ion-extract"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const mz = Number(new FormData(event.currentTarget).get("mz"));
+            if (Number.isFinite(mz) && mz >= 0 && mz <= 3276.75)
+              onIonSelect(mz);
+          }}
+        >
+          <label htmlFor="extract-mz">Extract m/z</label>
+          <input
+            id="extract-mz"
+            name="mz"
+            type="number"
+            required
+            min="0"
+            max="3276.75"
+            step="any"
+            key={ionMz ?? "none"}
+            defaultValue={ionMz ?? ""}
+            placeholder="e.g. 83"
+          />
+          <button type="submit">Show ion</button>
+          <span>or click an ion below</span>
+        </form>
+      )}
       {message ? (
         <div className="panel-state" role="alert">
           <p>{message}</p>
@@ -246,6 +279,9 @@ export function SpectrumPanel({
           <MassSpectrum
             key="raw"
             showCounts
+            onIonSelect={onIonSelect}
+            ionMz={ionMz}
+            ionTolerance={ionTolerance}
             series={[
               {
                 id: `scan-${scan.scan_index}`,
