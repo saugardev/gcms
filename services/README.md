@@ -3,6 +3,7 @@
 - [python/gcms](python/gcms/): API, CLI, input validation, reports and NumPy/SciPy baseline.
 - [rust](rust/): standalone Rust/PostgreSQL read API and saved-report importer,
   plus optional numerical kernels loaded by Python.
+- [../app](../app/): Next.js analyst workspace.
 
 [Workspace setup and read API](../docs/workspace.md). Python packaging remains
 at the repository root; Python source is under `python/gcms/`.

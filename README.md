@@ -6,7 +6,14 @@ browser dashboard or a JSON report.
 
 [Documentation](docs/README.md) · [HTTP API](docs/api.md) · [Sample report](examples/sample.html)
 
-## Getting started
+## Saved-analysis workspace
+
+The new UI lives in `app/`, with a Rust read API in `services/rust/` and
+PostgreSQL storage. It opens saved Rust results without reprocessing: linked
+chromatogram, component spectra and library candidates in one desktop workspace.
+See [local setup, API routes and checks](docs/workspace.md).
+
+## Existing processing API
 
 Install [uv](https://docs.astral.sh/uv/), then run from the repository root:
 

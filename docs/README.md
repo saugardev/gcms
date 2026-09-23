@@ -1,5 +1,8 @@
 # User guide
 
+[Next.js + Rust saved-analysis workspace](workspace.md): local setup, linked
+chromatogram/spectrum UI, PostgreSQL import and read endpoints.
+
 [Project](../README.md) · [HTTP API](api.md) · [Scientific method](science.md) · [Validation](validation.md) · [Python and Rust](benchmarks.md)
 
 Process an acquisition, inspect proposed identities, and reproduce the results.
