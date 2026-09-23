@@ -17,6 +17,7 @@ import {
 } from "@/lib/charts";
 
 import type { SelectionOptions } from "@/lib/selection";
+import { CardInfo } from "./card-info";
 
 function useWidth() {
   const ref = useRef<HTMLDivElement>(null);
@@ -152,6 +153,15 @@ export function Chromatogram({
         <div>
           <div className="card-title">
             <h2 id="tic-title">Total ion chromatogram</h2>
+            <CardInfo title="Total ion chromatogram">
+              Total detected ion signal over retention time. A peak can contain
+              more than one compound. Select peaks to inspect their spectra,
+              drag to select or zoom, or use Scan to inspect an individual
+              acquisition scan. Click an ion in the raw spectrum to overlay its
+              extracted ion chromatogram (EIC). The ± tolerance sets the mass
+              window; all traces share the same count scale. Hide Raw TIC to
+              focus on the ion signal.
+            </CardInfo>
           </div>
           <p>
             {mode === "scan"

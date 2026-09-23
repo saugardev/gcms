@@ -112,6 +112,8 @@ The existing live Python deployment is a separate application.
   0.5 Da; 0 selects the exact native mass). Counts are summed from stored ion traces
   on the same scale as the TIC. Hide Raw TIC to inspect the ion alone; × clears it.
   Selecting an ion does not change the active component or identify a compound.
+- The info icon after each card title opens an explanation. Click outside or
+  press Escape to close it.
 - Reload sample makes fresh HTTP reads. The small time beside it measures the
   analysis response, including transfer and JSON parsing, not processing time.
 

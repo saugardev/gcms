@@ -9,6 +9,7 @@ import {
   type IonTrace,
 } from "@/lib/api";
 import { Chromatogram } from "./plots";
+import { CardInfo } from "./card-info";
 import { SpectrumPanel, type SpectrumView } from "./spectrum-panel";
 import {
   ResultGuide,
@@ -404,6 +405,13 @@ export default function Workspace() {
                 <div>
                   <div className="card-title">
                     <h2 id="peaks-title">Detected components</h2>
+                    <CardInfo title="Detected components">
+                      Groups of ions detected by the saved analysis, each with a
+                      retention time and proposed identity. Select a row to
+                      inspect it; use checkboxes, Ctrl/⌘-click or Shift-click to
+                      compare several. Area % is relative signal area, not
+                      concentration.
+                    </CardInfo>
                     <span className="count">{peaks.length}</span>
                   </div>
                   <p id="selection-help">
@@ -638,6 +646,13 @@ export default function Workspace() {
                 <div>
                   <div className="card-title">
                     <h2 id="candidates-title">Library candidates</h2>
+                    <CardInfo title="Library candidates">
+                      Library entries with spectra resembling the active
+                      component, ranked by similarity. Select a candidate to
+                      compare its reference spectrum. Similarity is not a
+                      probability, and a leading match does not confirm chemical
+                      identity.
+                    </CardInfo>
                   </div>
                   <p>
                     {selected

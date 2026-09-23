@@ -10,6 +10,7 @@ import {
 } from "@/lib/api";
 import { MassSpectrum } from "./plots";
 import { ResultLabel } from "./result-labels";
+import { CardInfo } from "./card-info";
 
 export type SpectrumView = "library" | "compare" | "raw";
 
@@ -121,6 +122,13 @@ export function SpectrumPanel({
         <div>
           <div className="card-title">
             <h2 id="spectrum-title">{title}</h2>
+            <CardInfo title={title}>
+              {view === "compare"
+                ? "A separate spectrum for every selected component on the same mass-to-charge (m/z) axis. Each is scaled to its own strongest ion (100%), so compare ion patterns, not amounts. Zoom applies to all spectra; click a spectrum or its heading to activate its component and inspect its library candidates."
+                : view === "raw"
+                  ? "Ions recorded in one acquisition scan, including background. Click an ion or enter its m/z to show its signal over time on the chromatogram. Use the scan arrows or time input to move through the acquisition. The plot is scaled to its strongest ion (100%); hover to see counts."
+                  : "The selected component’s reconstructed ion pattern by mass-to-charge ratio (m/z). Blue sticks show the component; gray sticks below show the chosen library reference. Each spectrum is scaled to its strongest ion (100%). Drag to zoom and compare the patterns."}
+            </CardInfo>
           </div>
           <p>
             {view === "compare"

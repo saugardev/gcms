@@ -1222,6 +1222,51 @@ summary {
   align-items: center;
   gap: 4px;
 }
+.card-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+}
+.card-info:has(+ .card-tooltip:popover-open) {
+  color: var(--accent-ink);
+  background: var(--selected);
+}
+.card-tooltip {
+  width: min(320px, calc(100vw - 24px));
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 4px 20px #0002;
+  font-size: 12px;
+  line-height: 1.6;
+  font-weight: 400;
+  margin: auto;
+}
+@supports (position-area: bottom span-right) {
+  .card-tooltip {
+    inset: auto;
+    position-area: bottom span-right;
+    position-try-fallbacks: flip-inline, flip-block;
+    margin: 6px;
+  }
+}
+@media (pointer: coarse) {
+  .card-info {
+    width: 40px;
+    min-height: 40px;
+  }
+}
+
 .ion-line {
   stroke: var(--accent-ink);
   stroke-width: 1.8;
