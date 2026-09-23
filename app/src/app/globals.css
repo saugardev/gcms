@@ -123,8 +123,6 @@ p,
   padding: 0 20px;
   display: flex;
   flex-direction: column;
-  max-width: 1920px;
-  margin: auto;
 }
 .app-header {
   min-height: 64px;
