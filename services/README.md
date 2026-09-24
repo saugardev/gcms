@@ -1,7 +1,7 @@
 # Implementations
 
 - [python/gcms](python/gcms/): API, CLI, input validation, reports and NumPy/SciPy baseline.
-- [rust](rust/): standalone Rust/PostgreSQL API with sessions and a saved-report importer,
+- [rust](rust/): standalone Rust/PostgreSQL API with sessions and shared reviews and saved-report importer,
   plus optional numerical kernels loaded by Python.
 - [../app](../app/): Next.js analyst workspace.
 

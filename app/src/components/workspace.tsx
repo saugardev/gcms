@@ -11,6 +11,8 @@ import {
 import { Chromatogram } from "./plots";
 import { CardInfo } from "./card-info";
 import { SpectrumPanel, type SpectrumView } from "./spectrum-panel";
+import { useSharedReviews } from "./use-shared-reviews";
+import { ReviewNotifications } from "./review-notifications";
 import type { SessionUser } from "@/lib/session";
 import { ambiguityReasons } from "@/lib/assignments";
 import {
@@ -46,6 +48,7 @@ export default function Workspace({ user }: { user: SessionUser }) {
   }
   const [analyses, setAnalyses] = useState<AnalysisSummary[] | null>(null);
   const [analysisId, setAnalysisId] = useState("");
+  const shared = useSharedReviews(analysisId);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [selection, setSelection] = useState(emptySelection);
   const [spectrumView, setSpectrumView] = useState<SpectrumView>("library");
@@ -172,11 +175,19 @@ export default function Workspace({ user }: { user: SessionUser }) {
       analysis: analysis.id,
     });
     if (selectedId) params.set("peak", selectedId);
+    const previous = new URLSearchParams(location.search);
+    const requestedCandidate = previous.get("peak") === selectedId ? previous.get("candidate") : null;
+    if (requestedCandidate) params.set("candidate", requestedCandidate);
     history.replaceState(null, "", `?${params}`);
     if (!selectedId) return;
     const key = `${analysis.id}/${selectedId}`;
     const saved = cache.current.get(key);
-    if (saved) setDetail(saved);
+    function showDetail(result: ComponentDetail) {
+      setDetail(result);
+      const candidate = result.component.candidates.findIndex((item) => item.group_id === requestedCandidate);
+      setCandidateIndex(Math.max(0, candidate));
+    }
+    if (saved) showDetail(saved);
     else
       fetchSaved<ComponentDetail>(
         `/analyses/${analysis.id}/components/${selectedId}`,
@@ -185,7 +196,7 @@ export default function Workspace({ user }: { user: SessionUser }) {
         .then((result) => {
           if (controller.signal.aborted) return;
           cache.current.set(key, result);
-          setDetail(result);
+          showDetail(result);
         })
         .catch((err) => {
           if (!controller.signal.aborted) setDetailError(err.message);
@@ -318,6 +329,7 @@ export default function Workspace({ user }: { user: SessionUser }) {
           </span>
         </div>
         <div className="account-controls"><span>{user.name}</span><button disabled={signingOut} onClick={signOut}>{signingOut ? "Signing out…" : "Sign out"}</button>{signOutError && <span role="alert">{signOutError}</span>}</div>
+        <ReviewNotifications events={shared.notifications} connection={shared.connection} userId={user.id} onDismiss={shared.dismiss} />
       </header>
       {error ? (
         <section className="state-page" role="alert">
@@ -587,6 +599,12 @@ export default function Workspace({ user }: { user: SessionUser }) {
                           >
                             {p.name || "Unassigned"}
                           </span>
+                          {shared.reviews[p.component_id] && <span className="analyst-summary">
+                            {shared.reviews[p.component_id].decisions.find((d) => d.decision === "accepted")
+                              ? `Analyst accepted: ${shared.reviews[p.component_id].decisions.find((d) => d.decision === "accepted")!.candidate_name}`
+                              : shared.reviews[p.component_id].decisions.some((d) => d.decision === "rejected")
+                                ? "Analyst review: candidates rejected" : "Analyst review: unreviewed"}
+                          </span>}
                           <span className="row-meta">
                             <span>
                               {p.component_id.replace("component-", "#")}
@@ -666,7 +684,7 @@ export default function Workspace({ user }: { user: SessionUser }) {
                       component, ranked by similarity. Select a candidate to
                       compare its reference spectrum. Similarity is not a
                       probability, and a leading match does not confirm chemical
-                      identity.
+                      identity. Analyst decisions are shared with all registered users. Accepting a candidate group does not distinguish identities within it.
                     </CardInfo>
                   </div>
                   <p>
@@ -679,6 +697,11 @@ export default function Workspace({ user }: { user: SessionUser }) {
                   {detail?.component.candidates.length ?? "—"}
                 </span>
               </div>
+              <div className="shared-review-status" role="status">
+                <span data-live={shared.connection === "Live"}>{shared.connection}</span>
+                <span>{shared.saving ? "Saving decision…" : "Shared analyst decisions"}</span>
+              </div>
+              {shared.error && <p className="review-save-error" role="alert">{shared.error}</p>}
               <div className="candidate-scroll">
                 {detail ? (
                   <>
@@ -748,6 +771,22 @@ export default function Workspace({ user }: { user: SessionUser }) {
                                 <small>similarity</small>
                               </span>
                             </button>
+                            <div className="candidate-decision">
+                              <div className="button-group" role="group" aria-label={`Analyst decision for candidate ${index + 1}`}>
+                                <button disabled={!shared.loaded || !!shared.saving}
+                                  aria-pressed={shared.reviews[selectedId]?.decisions.find((d) => d.group_id === c.group_id)?.decision === "accepted"}
+                                  onClick={() => shared.save(selectedId, c.group_id, "accepted")}>Accept</button>
+                                <button disabled={!shared.loaded || !!shared.saving}
+                                  aria-pressed={shared.reviews[selectedId]?.decisions.find((d) => d.group_id === c.group_id)?.decision === "rejected"}
+                                  onClick={() => shared.save(selectedId, c.group_id, "rejected")}>Reject</button>
+                                <button disabled={!shared.loaded || !!shared.saving || !shared.reviews[selectedId]?.decisions.some((d) => d.group_id === c.group_id && d.decision !== "unreviewed")}
+                                  onClick={() => shared.save(selectedId, c.group_id, "unreviewed")}>Clear decision</button>
+                              </div>
+                              <small>{(() => {
+                                const decision = shared.reviews[selectedId]?.decisions.find((d) => d.group_id === c.group_id);
+                                return decision ? `${human(decision.decision)} · ${decision.updated_by.name} · ${new Date(decision.updated_at).toLocaleString()}` : "Unreviewed";
+                              })()}</small>
+                            </div>
                           </li>
                         ))}
                       </ol>

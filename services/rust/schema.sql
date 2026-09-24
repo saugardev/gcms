@@ -54,3 +54,26 @@ CREATE TABLE IF NOT EXISTS app_sessions (
     created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS app_sessions_user ON app_sessions(user_id);
+ALTER TABLE components ADD COLUMN IF NOT EXISTS review_version bigint NOT NULL DEFAULT 0;
+CREATE TABLE IF NOT EXISTS candidate_decisions (
+    analysis_id text NOT NULL,
+    component_id text NOT NULL,
+    group_id text NOT NULL,
+    candidate_name text NOT NULL,
+    decision text NOT NULL CHECK (decision IN ('accepted', 'rejected', 'unreviewed')),
+    updated_by text NOT NULL REFERENCES app_users(id),
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (analysis_id, component_id, group_id),
+    FOREIGN KEY (analysis_id, component_id) REFERENCES components(analysis_id, id)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS candidate_one_accepted
+    ON candidate_decisions(analysis_id, component_id) WHERE decision = 'accepted';
+CREATE TABLE IF NOT EXISTS review_events (
+    id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    analysis_id text NOT NULL,
+    component_id text NOT NULL,
+    actor_id text NOT NULL REFERENCES app_users(id),
+    data jsonb NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    FOREIGN KEY (analysis_id, component_id) REFERENCES components(analysis_id, id)
+);

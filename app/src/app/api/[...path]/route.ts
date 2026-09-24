@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { apiOrigin, appOrigin, SESSION_COOKIE } from "@/lib/session";
 
-const analysisPath = /^analyses(?:\/[a-f0-9]{64}(?:\/(?:spectra|scans|ions|components\/component-\d{4}))?)?$/;
+const analysisPath = /^analyses(?:\/[a-f0-9]{64}(?:\/(?:reviews|spectra|scans|ions|components\/component-\d{4}))?)?$/;
+const decisionPath = /^analyses\/[a-f0-9]{64}\/components\/component-\d{4}\/candidates\/[^/]+\/decision$/;
 function error(message: string, status: number) {
   return NextResponse.json({ error: { message } }, { status, headers: { "cache-control": "no-store" } });
 }
@@ -10,8 +11,9 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path: st
   const path = segments.join("/");
   const auth = request.method === "POST" && ["auth/login", "auth/register"].includes(path);
   const logout = request.method === "POST" && path === "auth/logout";
+  const write = request.method === "PUT" && decisionPath.test(path);
   const read = request.method === "GET" && (analysisPath.test(path) || path === "me");
-  if (!auth && !logout && !read) return error("Endpoint not found.", 404);
+  if (!auth && !logout && !write && !read) return error("Endpoint not found.", 404);
   if (request.method !== "GET" && request.headers.get("origin") !== appOrigin) {
     return error("Request origin is not allowed.", 403);
   }
@@ -20,7 +22,7 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path: st
   const headers = new Headers({ accept: "application/json" });
   if (!auth) headers.set("authorization", `Session ${token}`);
   let body: string | undefined;
-  if (auth) {
+  if (auth || write) {
     if (request.headers.get("content-type")?.split(";")[0] !== "application/json") return error("Send JSON.", 415);
     // Bound the streamed body as well as Content-Length before buffering credentials.
     const reader = request.body?.getReader();
@@ -64,3 +66,4 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path: st
 }
 export const GET = proxy;
 export const POST = proxy;
+export const PUT = proxy;

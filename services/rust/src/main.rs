@@ -1,5 +1,6 @@
 mod auth;
 mod import;
+mod reviews;
 mod scans;
 
 use axum::{
@@ -8,7 +9,7 @@ use axum::{
     http::{StatusCode, header},
     middleware::{self, Next},
     response::{IntoResponse, Response},
-    routing::{get, post},
+    routing::{get, post, put},
 };
 use deadpool_postgres::{Config, Pool, Runtime};
 use serde_json::{Value, json};
@@ -314,7 +315,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 .await?
                 .simple_query("SELECT id FROM analyses LIMIT 0")
                 .await?;
-            pool.get().await?.simple_query("SELECT token_hash FROM app_sessions LIMIT 0").await?;
+            pool.get().await?.simple_query("SELECT token_hash FROM app_sessions LIMIT 0; SELECT review_version FROM components LIMIT 0; SELECT id FROM review_events LIMIT 0").await?;
             let state = auth::AppState::new(
                 pool,
                 env::var("APP_ORIGIN").unwrap_or_else(|_| "http://127.0.0.1:3000".into()),
@@ -343,6 +344,11 @@ fn app_router(state: auth::AppState) -> Router {
         .route("/v1/analyses/{id}/spectra", get(spectra))
         .route("/v1/analyses/{id}/scans", get(scan))
         .route("/v1/analyses/{id}/ions", get(ion_trace))
+        .route("/v1/analyses/{id}/reviews", get(reviews::snapshot))
+        .route(
+            "/v1/analyses/{id}/components/{component}/candidates/{group}/decision",
+            put(reviews::decide),
+        )
         .route_layer(middleware::from_fn_with_state(
             state.clone(),
             auth::require_session,
@@ -352,6 +358,7 @@ fn app_router(state: auth::AppState) -> Router {
         .route("/health", get(health))
         .route("/v1/auth/register", post(auth::register))
         .route("/v1/auth/login", post(auth::login))
+        .route("/v1/analyses/{id}/events", get(reviews::events))
         .fallback(|| async { ApiError(StatusCode::NOT_FOUND, "Endpoint not found.") })
         .layer(DefaultBodyLimit::max(16 * 1024))
         .layer(middleware::from_fn(timing))

@@ -129,7 +129,7 @@ its saved detailed corrected trace. Select/Zoom clicks choose the nearest detect
 component; Scan clicks choose the nearest raw acquisition scan. Proposals, similarity scores and area
 percentages retain the original scientific limitations in [science.md](science.md).
 
-## Accounts
+## Accounts and shared analyst decisions
 
 Authentication adapts the browser-session flow from `saugardev/saas-template`:
 Argon2id passwords, random opaque sessions with only SHA-256 token hashes stored
@@ -141,8 +141,31 @@ minutes, with at most two concurrent password hashes. These limits are in memory
 Email addresses are unverified login identifiers; no recovery emails or social
 login are implemented.
 
-Registration is open. **Every registered account can read all analyses .** There are no private workspaces or ownership-based filters.
+Registration is open. **Every registered account can read all analyses and edit
+shared decisions.** There are no private workspaces or ownership-based filters.
 All saved-data routes require a live session; `/health` remains public.
+
+Each candidate has Accept, Reject, and Clear decision controls. One candidate
+**group** per component can be accepted. Accepting another clears the previous
+acceptance without rejecting other candidates. A group containing several
+identities remains a group; analyst acceptance does not resolve its identities.
+Decisions persist independently of the immutable engine results, including
+reviewer name, time, a component version, and append-only change history in
+`review_events`. Re-importing the same saved report preserves these decisions.
+Stale writes return 409 with current review state, allowing a deliberate retry.
+
+WebSockets stream committed decisions at `/ws/analyses/{id}` through Next.js to
+Rust. The handshake checks the session cookie and exact Origin; token URLs are
+never used. Connected sessions receive updated decisions and a dismissible
+notification in the top-right box with the reviewer, candidate, and a View component action. Selection,
+zoom, filters, and spectral comparison remain personal. Reconnects fetch a fresh
+review snapshot, merged by component version. Revoked/expired sockets close on
+the next event or 15-second heartbeat. Database failures fail closed.
+
+Run **one Rust API process**: live fan-out and authentication throttling are
+process-local. Add PostgreSQL notifications and shared throttling before running
+multiple replicas. Reverse proxies must forward WebSocket upgrades to Next.js;
+the pinned Next.js server forwards the dedicated WebSocket rewrite to Rust.
 
 ## Rust API
 
@@ -153,6 +176,9 @@ All saved-data routes require a live session; `/health` remains public.
 | POST | `/v1/auth/login` | Email/password → user, new session and expiry |
 | POST | `/v1/auth/logout` | Revoke current session |
 | GET | `/v1/me` | Current authenticated user |
+| GET | `/v1/analyses/{id}/reviews` | Lightweight shared review snapshot |
+| PUT | `/v1/analyses/{id}/components/{component_id}/candidates/{group_id}/decision` | `{decision: accepted/rejected/unreviewed, expected_version: number}` → review and event |
+| GET (upgrade) | `/v1/analyses/{id}/events` | Authenticated, Origin-checked WebSocket |
 | GET | `/v1/analyses` | Latest 100 saved sample summaries |
 | GET | `/v1/analyses/{id}` | Metadata, chromatogram and compact peak summaries |
 | GET | `/v1/analyses/{id}/components/{component_id}` | Original component, candidates, spectra and optional review annotation |
@@ -195,3 +221,16 @@ count, plus exact spectra and nearest-time lookup across the acquisition. It als
 compares four full ion chromatograms, including exact masses, tolerance boundaries
 and absent ions, against the acquisition.
 No analysis is rerun. Keep the PostgreSQL data volume to retain imported results.
+
+Authentication/collaboration integration check (uses an isolated, disposable
+PostgreSQL schema and starts its own Rust API; never edits existing analyses):
+
+```sh
+cargo build --locked --manifest-path services/rust/Cargo.toml \
+  --no-default-features --features server --bin gcms-api
+uv run --with websockets python scripts/check_collaboration.py
+```
+
+Requires `DATABASE_URL`, `psql`, and schema-create permissions. Covers authentication,
+expiry/revocation, throttling, shared review writes, optimistic concurrency, audit
+history, immutable reports, two WebSocket clients, and reconnect snapshots.

@@ -11,7 +11,7 @@ browser dashboard or a JSON report.
 The new UI lives in `app/`, with a Rust API in `services/rust/` and
 PostgreSQL storage. It opens saved Rust results without reprocessing: linked
 chromatogram, component spectra and library candidates in one desktop workspace.
-Email/password accounts protect saved analyses with browser sessions.
+Email/password accounts save shared candidate decisions with live WebSocket updates.
 See [local setup, API routes and checks](docs/workspace.md).
 
 ## Existing processing API
