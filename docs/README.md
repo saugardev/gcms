@@ -9,6 +9,9 @@ Process an acquisition, inspect proposed identities, and reproduce the results.
 Run the commands below from the repository root. For the browser dashboard and
 ZIP uploads, follow the [HTTP API guide](api.md).
 
+[Rejected processing experiments](rejected-experiments.md): measured results,
+methods to reimplement, and reasons the production engine was retained.
+
 ## Run an analysis
 
 From the repository root, with [uv](https://docs.astral.sh/uv/). Python 3.12.13 is
