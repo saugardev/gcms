@@ -66,12 +66,15 @@ Run commands from the repository root.
    pnpm --dir app dev
    ```
 
-Open **http://127.0.0.1:3000**. The UI proxies `/api/*` to the Rust service at
+Open **http://127.0.0.1:3000**. The UI authenticates `/api/*` requests and forwards them to the Rust service at
 `http://127.0.0.1:8001/v1/*`. To change that address, copy `app/.env.example` to
 `app/.env.local` and set `GCMS_API_URL` before starting or building Next.js.
 For a production UI build, run `pnpm --dir app build` then `pnpm --dir app start`.
-Both services bind to loopback by default. This local version has no login;
-remote hosting needs the deployment's access controls and database TLS setup.
+Both services bind to loopback by default. Register at `/register`, then sign in.
+Set `APP_ORIGIN` to the exact browser origin in both service environments (default
+`http://127.0.0.1:3000`); production uses HTTPS and Secure cookies. Changing the
+browser hostname or port requires updating this setting. Remote hosting still
+needs HTTPS termination and database TLS setup.
 The existing live Python deployment is a separate application.
 
 ## Analyst interactions
@@ -126,11 +129,30 @@ its saved detailed corrected trace. Select/Zoom clicks choose the nearest detect
 component; Scan clicks choose the nearest raw acquisition scan. Proposals, similarity scores and area
 percentages retain the original scientific limitations in [science.md](science.md).
 
-## Rust read API
+## Accounts
+
+Authentication adapts the browser-session flow from `saugardev/saas-template`:
+Argon2id passwords, random opaque sessions with only SHA-256 token hashes stored
+in PostgreSQL, a 30-day expiry, and logout revocation. Next.js keeps the token in
+an HttpOnly, SameSite=Lax cookie and forwards it to Rust using `Authorization:
+Session <token>`. Production cookies are Secure. The token never reaches browser
+JavaScript. Login/registration allow 10 attempts per normalized email per 15
+minutes, with at most two concurrent password hashes. These limits are in memory.
+Email addresses are unverified login identifiers; no recovery emails or social
+login are implemented.
+
+Registration is open. **Every registered account can read all analyses .** There are no private workspaces or ownership-based filters.
+All saved-data routes require a live session; `/health` remains public.
+
+## Rust API
 
 | Method | Path | Response |
 | --- | --- | --- |
 | GET | `/health` | Database connectivity |
+| POST | `/v1/auth/register` | Name/email/password → user, opaque session and expiry (server-to-server only) |
+| POST | `/v1/auth/login` | Email/password → user, new session and expiry |
+| POST | `/v1/auth/logout` | Revoke current session |
+| GET | `/v1/me` | Current authenticated user |
 | GET | `/v1/analyses` | Latest 100 saved sample summaries |
 | GET | `/v1/analyses/{id}` | Metadata, chromatogram and compact peak summaries |
 | GET | `/v1/analyses/{id}/components/{component_id}` | Original component, candidates, spectra and optional review annotation |
@@ -163,7 +185,9 @@ pnpm --dir app build
 python3 scripts/check_workspace.py artifacts/review-rust.json --acquisition /path/to/sample.D/data.ms
 ```
 
-The final check requires the imported sample and running Rust API. It compares
+The final check requires the imported sample, running Rust API, and a valid
+`GCMS_SESSION_TOKEN` environment variable (obtain it using the Rust login endpoint;
+do not put it in command arguments or source files). It compares
 every stored component, candidate spectrum and review trace to the saved report,
 checks batch comparison, read-only routes and errors, and measures ten local reads
 per endpoint. Optional `--acquisition` verifies every raw timestamp and total ion

@@ -11,6 +11,7 @@ import {
 import { Chromatogram } from "./plots";
 import { CardInfo } from "./card-info";
 import { SpectrumPanel, type SpectrumView } from "./spectrum-panel";
+import type { SessionUser } from "@/lib/session";
 import { ambiguityReasons } from "@/lib/assignments";
 import {
   ResultGuide,
@@ -30,7 +31,19 @@ import {
 const minutes = (seconds: number) => (seconds / 60).toFixed(3);
 const human = (value: string) => value.replaceAll("_", " ");
 
-export default function Workspace() {
+export default function Workspace({ user }: { user: SessionUser }) {
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState("");
+  async function signOut() {
+    setSigningOut(true); setSignOutError("");
+    try {
+      const response = await fetch("/api/auth/logout", { method: "POST" });
+      if (!response.ok && response.status !== 401) throw new Error();
+      location.assign("/login");
+    } catch {
+      setSignOutError("Could not sign out. Please try again."); setSigningOut(false);
+    }
+  }
   const [analyses, setAnalyses] = useState<AnalysisSummary[] | null>(null);
   const [analysisId, setAnalysisId] = useState("");
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
@@ -304,6 +317,7 @@ export default function Workspace() {
                 : ""}
           </span>
         </div>
+        <div className="account-controls"><span>{user.name}</span><button disabled={signingOut} onClick={signOut}>{signingOut ? "Signing out…" : "Sign out"}</button>{signOutError && <span role="alert">{signOutError}</span>}</div>
       </header>
       {error ? (
         <section className="state-page" role="alert">

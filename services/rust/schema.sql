@@ -37,3 +37,20 @@ CREATE TABLE IF NOT EXISTS raw_ion_traces (
     points jsonb NOT NULL,
     PRIMARY KEY (analysis_id, mass_key)
 );
+
+-- Browser accounts are shared lab reviewers; computed reports stay immutable.
+CREATE TABLE IF NOT EXISTS app_users (
+    id text PRIMARY KEY,
+    email text NOT NULL UNIQUE CHECK (email = lower(email)),
+    name text NOT NULL,
+    password_hash text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS app_sessions (
+    token_hash bytea PRIMARY KEY,
+    user_id text NOT NULL REFERENCES app_users(id),
+    expires_at timestamptz NOT NULL,
+    revoked_at timestamptz,
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS app_sessions_user ON app_sessions(user_id);

@@ -1,13 +1,14 @@
+mod auth;
 mod import;
 mod scans;
 
 use axum::{
     Json, Router,
-    extract::{Path, Query, State},
+    extract::{DefaultBodyLimit, Path, Query, State},
     http::{StatusCode, header},
     middleware::{self, Next},
     response::{IntoResponse, Response},
-    routing::get,
+    routing::{get, post},
 };
 use deadpool_postgres::{Config, Pool, Runtime};
 use serde_json::{Value, json};
@@ -19,6 +20,7 @@ use std::{
 };
 use tokio_postgres::NoTls;
 
+#[derive(Debug)]
 struct ApiError(StatusCode, &'static str);
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
@@ -312,17 +314,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 .await?
                 .simple_query("SELECT id FROM analyses LIMIT 0")
                 .await?;
-            let router = Router::new()
-                .route("/health", get(health))
-                .route("/v1/analyses", get(analyses))
-                .route("/v1/analyses/{id}", get(analysis))
-                .route("/v1/analyses/{id}/components/{component}", get(component))
-                .route("/v1/analyses/{id}/spectra", get(spectra))
-                .route("/v1/analyses/{id}/scans", get(scan))
-                .route("/v1/analyses/{id}/ions", get(ion_trace))
-                .fallback(|| async { ApiError(StatusCode::NOT_FOUND, "Endpoint not found.") })
-                .layer(middleware::from_fn(timing))
-                .with_state(pool);
+            pool.get().await?.simple_query("SELECT token_hash FROM app_sessions LIMIT 0").await?;
+            let state = auth::AppState::new(
+                pool,
+                env::var("APP_ORIGIN").unwrap_or_else(|_| "http://127.0.0.1:3000".into()),
+            )?;
+            let router = app_router(state);
             let address = env::var("GCMS_BIND").unwrap_or_else(|_| "127.0.0.1:8001".into());
             let listener = tokio::net::TcpListener::bind(&address).await?;
             println!("GC-MS saved-analysis API listening on http://{address}");
@@ -334,4 +331,29 @@ async fn main() -> Result<(), Box<dyn Error>> {
         }
     }
     Ok(())
+}
+
+fn app_router(state: auth::AppState) -> Router {
+    let protected = Router::new()
+        .route("/v1/me", get(auth::me))
+        .route("/v1/auth/logout", post(auth::logout))
+        .route("/v1/analyses", get(analyses))
+        .route("/v1/analyses/{id}", get(analysis))
+        .route("/v1/analyses/{id}/components/{component}", get(component))
+        .route("/v1/analyses/{id}/spectra", get(spectra))
+        .route("/v1/analyses/{id}/scans", get(scan))
+        .route("/v1/analyses/{id}/ions", get(ion_trace))
+        .route_layer(middleware::from_fn_with_state(
+            state.clone(),
+            auth::require_session,
+        ));
+    Router::new()
+        .merge(protected)
+        .route("/health", get(health))
+        .route("/v1/auth/register", post(auth::register))
+        .route("/v1/auth/login", post(auth::login))
+        .fallback(|| async { ApiError(StatusCode::NOT_FOUND, "Endpoint not found.") })
+        .layer(DefaultBodyLimit::max(16 * 1024))
+        .layer(middleware::from_fn(timing))
+        .with_state(state)
 }

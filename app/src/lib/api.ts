@@ -94,6 +94,10 @@ export async function fetchSaved<T>(
   signal?: AbortSignal,
 ): Promise<T> {
   const response = await fetch(`/api${path}`, { signal, cache: "no-store" });
+  if (response.status === 401) {
+    location.assign(`/login?return_to=${encodeURIComponent(location.pathname + location.search)}`);
+    throw new Error("Your session ended. Please sign in again.");
+  }
   if (!response.ok)
     throw new Error(
       response.status === 404

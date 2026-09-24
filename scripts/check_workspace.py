@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import os
 import statistics
 import struct
 import time
@@ -22,7 +23,7 @@ def main():
 
     def request(path, status=200, method="GET"):
         try:
-            response = urlopen(Request(args.url + path, method=method), timeout=10)
+            response = urlopen(Request(args.url + path, method=method, headers={"Authorization": "Session " + os.environ.get("GCMS_SESSION_TOKEN", "")}), timeout=10)
         except HTTPError as error:
             response = error
         with response:
