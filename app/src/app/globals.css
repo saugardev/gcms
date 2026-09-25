@@ -405,9 +405,6 @@ tbody tr:hover {
 tbody tr[data-selected="true"] {
   background: var(--selected);
 }
-tbody tr[data-selected="true"] td:first-child {
-  box-shadow: inset 3px 0 var(--accent);
-}
 .numeric {
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -469,8 +466,8 @@ tbody tr[data-selected="true"] td:first-child {
 }
 .candidate[aria-pressed="true"] {
   background: var(--selected);
-  box-shadow: inset 3px 0 var(--accent);
 }
+.candidate[aria-pressed="true"] .candidate-rank { color: var(--ink); font-weight: 650; }
 .candidate-rank {
   color: var(--muted);
   font-size: 11px;
@@ -914,12 +911,6 @@ summary {
 .peaks-panel td {
   height: 56px;
 }
-.peaks-panel tr[data-selected="true"] td:first-child {
-  box-shadow: none;
-}
-.peaks-panel tr[data-active="true"] td:first-child {
-  box-shadow: inset 3px 0 var(--accent);
-}
 .peaks-panel tr[data-active="true"] .row-select {
   font-weight: 700;
 }
@@ -1302,10 +1293,10 @@ summary {
 .sidebar-nav a { display: flex; gap: 9px; align-items: center; min-height: 42px; padding: 9px; border: 1px solid transparent; border-radius: 6px; color: #bcbcbc; text-decoration: none; font-size: 12px; font-weight: 550; }
 .sidebar-nav a:hover { color: #fff; background: #ffffff08; }
 .sidebar-nav a > span:not(.nav-count) { white-space: nowrap; }
-.sidebar-nav a[aria-current="page"] { color: #fff; background: #ffffff0d; border-color: #ffffff12; box-shadow: inset 2px 0 #4397c6; }
-.sidebar-nav a[aria-current="page"] svg { color: #77b9de; fill: #4397c615; }
+.sidebar-nav a[aria-current="page"] { color: #fff; background: #ffffff12; border-color: #ffffff14; font-weight: 650; }
+.sidebar-nav a[aria-current="page"] svg { fill: #ffffff12; stroke-width: 2; }
 .sidebar-nav svg, .sign-out svg, .notification-trigger svg { width: 18px; height: 18px; flex-shrink: 0; stroke: currentColor; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.nav-count { margin-left: auto; color: #b8d9ec; font-size: 10px; padding: 1px 5px; border-radius: 4px; background: #4397c61a; font-variant-numeric: tabular-nums; }
+.nav-count { margin-left: auto; color: #d4d4d4; font-size: 10px; padding: 1px 5px; border-radius: 4px; background: #ffffff0d; font-variant-numeric: tabular-nums; }
 .sidebar-account { margin-top: auto; padding-top: 18px; border-top: 1px solid #ffffff12; display: grid; gap: 16px; }
 .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 0 8px; min-width: 0; }
 .user-avatar { display: grid; place-items: center; background: #ffffff0e; border: 1px solid #ffffff14; border-radius: 8px; width: 32px; height: 32px; flex-shrink: 0; font-size: 13px; }
