@@ -16,13 +16,7 @@ else
   exit 1
 fi
 
-# Complete heredoc prevents installers from consuming the remaining SSH input.
-{
-  printf "bash -s -- '%s' <<'GCMS_DEPLOY_SCRIPT'\n" "$revision"
-  cat deploy/runtime.sh
-  printf '\nGCMS_DEPLOY_SCRIPT\n'
-} | jio connect "$vm"
-
+# Allocate the public origin before building/configuring browser sessions.
 published="$(jio ports "$vm")"
 url="$(awk '$1 == 8000 && $2 == "published" { print $3; exit }' <<< "$published")"
 if [[ -z "$url" ]]; then
@@ -33,7 +27,12 @@ if [[ -z "$url" ]]; then
   done
 fi
 [[ "$url" =~ ^https://[a-zA-Z0-9.-]+(:[0-9]+)?$ ]] || { echo 'Invalid HTTPS origin from Jio' >&2; exit 1; }
-for path in /health / '/v1/sample?review=true&engine=python' '/v1/sample?review=true&engine=rust'; do
-  curl --fail --silent --show-error --retry 10 --retry-all-errors --retry-delay 2 --max-time 120 "$url$path" --output /dev/null
-done
+# Complete heredoc prevents installers from consuming the remaining SSH input.
+{
+  printf "bash -s -- '%s' '%s' <<'GCMS_DEPLOY_SCRIPT'\n" "$revision" "$url"
+  cat deploy/runtime.sh
+  printf '\nGCMS_DEPLOY_SCRIPT\n'
+} | jio connect "$vm"
+
+bash deploy/check.sh "$url" "$url" "$revision"
 printf 'App: %s\nRevision: %s\n' "$url" "$revision"

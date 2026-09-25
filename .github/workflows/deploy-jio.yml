@@ -24,7 +24,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Check deployment scripts
-        run: bash -n deploy/jio.sh deploy/runtime.sh
+        run: bash -n deploy/jio.sh deploy/runtime.sh deploy/check.sh
       - name: Install Jio
         run: |
           curl -fsSL https://github.com/jiovannish/client/releases/download/v0.3.1/install.sh -o "$RUNNER_TEMP/install-jio.sh"

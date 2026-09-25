@@ -73,9 +73,9 @@ For a production UI build, run `pnpm --dir app build` then `pnpm --dir app start
 Both services bind to loopback by default. Register at `/register`, then sign in.
 Set `APP_ORIGIN` to the exact browser origin in both service environments (default
 `http://127.0.0.1:3000`); production uses HTTPS and Secure cookies. Changing the
-browser hostname or port requires updating this setting. Remote hosting still
-needs HTTPS termination and database TLS setup.
-The existing live Python deployment is a separate application.
+browser hostname or port requires updating this setting. The [Jio deployment](deployment.md)
+runs this workspace behind HTTPS, with PostgreSQL accessed through a local Unix
+socket using peer authentication. Other hosts need their own transport security.
 
 ## Analyst interactions
 
