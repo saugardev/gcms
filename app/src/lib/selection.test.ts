@@ -5,6 +5,7 @@ import {
   selectAll,
   selectComponent,
   selectRange,
+  selectionFromRoute,
 } from "./selection.ts";
 
 test("desktop selection follows the visible order and keeps an active selected component", () => {
@@ -45,4 +46,15 @@ test("desktop selection follows the visible order and keeps an active selected c
   assert.deepEqual(selectRange(single, ["c", "d"], true).ids, ["b", "c", "d"]);
   assert.deepEqual(selectRange(single, []), emptySelection);
   assert.deepEqual(selectRange(single, ["a", "b"], true).ids, ["b", "a"]);
+});
+
+test("page navigation preserves selection while component links select their destination", () => {
+  const order = ["a", "b", "c"];
+  const multiple = selectRange(emptySelection, ["a", "b"]);
+  assert.equal(selectionFromRoute(multiple, "b", order), multiple);
+  assert.equal(selectionFromRoute(multiple, null, order), multiple);
+  assert.equal(selectionFromRoute(multiple, "missing", order), multiple);
+  assert.deepEqual(selectionFromRoute(multiple, "c", order), {
+    ids: ["c"], active: "c", anchor: "c",
+  });
 });

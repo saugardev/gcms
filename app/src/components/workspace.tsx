@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
 import {
   fetchSaved,
   type Analysis,
@@ -30,13 +31,18 @@ import {
   selectAll,
   selectComponent,
   selectRange,
+  selectionFromRoute,
   type SelectionOptions,
 } from "@/lib/selection";
 
 const minutes = (seconds: number) => (seconds / 60).toFixed(3);
 const human = (value: string) => value.replaceAll("_", " ");
 
-export default function Workspace({ user, view = "dashboard" }: { user: SessionUser; view?: "dashboard" | "accepted" }) {
+export default function Workspace({ user }: { user: SessionUser }) {
+  const view = usePathname() === "/accepted" ? "accepted" : "dashboard";
+  const searchParams = useSearchParams();
+  const route = searchParams.toString();
+  const [previousRoute, setPreviousRoute] = useState(route);
   const [analyses, setAnalyses] = useState<AnalysisSummary[] | null>(null);
   const [analysisId, setAnalysisId] = useState("");
   const shared = useSharedReviews(analysisId);
@@ -68,6 +74,22 @@ export default function Workspace({ user, view = "dashboard" }: { user: SessionU
   const [sort, setSort] = useState("time");
   const cache = useRef(new Map<string, ComponentDetail>());
   const rows = useRef<HTMLDivElement>(null);
+
+  // Apply incoming links before effects can write the previous selection to the URL.
+  // Our own URL updates leave the current multi-selection intact.
+  if (route !== previousRoute) {
+    setPreviousRoute(route);
+    const requestedAnalysis = searchParams.get("analysis");
+    if (requestedAnalysis && requestedAnalysis !== analysisId) {
+      setAnalysisId(requestedAnalysis);
+      setAnalysis(null);
+      setSelection(emptySelection);
+    } else if (analysis) {
+      const next = selectionFromRoute(selection, searchParams.get("peak"), analysis.peaks.map((peak) => peak.component_id));
+      if (next !== selection) setSelection(next);
+    }
+  }
+  const requestedCandidate = searchParams.get("peak") === selectedId ? searchParams.get("candidate") : null;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -157,7 +179,7 @@ export default function Workspace({ user, view = "dashboard" }: { user: SessionU
   }, [analysis, ionMz, ionTolerance, ionRetry]);
 
   useEffect(() => {
-    if (!analysis) return;
+    if (!analysis || view === "accepted") return;
     const controller = new AbortController();
     setDetail(null);
     setDetailError("");
@@ -166,11 +188,9 @@ export default function Workspace({ user, view = "dashboard" }: { user: SessionU
       analysis: analysis.id,
     });
     if (selectedId) params.set("peak", selectedId);
-    const previous = new URLSearchParams(location.search);
-    const requestedCandidate = previous.get("peak") === selectedId ? previous.get("candidate") : null;
     if (requestedCandidate) params.set("candidate", requestedCandidate);
     history.replaceState(null, "", `?${params}`);
-    if (!selectedId || view === "accepted") return;
+    if (!selectedId) return;
     const key = `${analysis.id}/${selectedId}`;
     const saved = cache.current.get(key);
     function showDetail(result: ComponentDetail) {
@@ -193,7 +213,7 @@ export default function Workspace({ user, view = "dashboard" }: { user: SessionU
           if (!controller.signal.aborted) setDetailError(err.message);
         });
     return () => controller.abort();
-  }, [analysis, selectedId, detailRetry, view]);
+  }, [analysis, selectedId, detailRetry, view, requestedCandidate]);
 
   const peaks = useMemo(
     () =>
@@ -282,7 +302,7 @@ export default function Workspace({ user, view = "dashboard" }: { user: SessionU
   const scopeQuery = new URLSearchParams();
   if (analysisId) scopeQuery.set("analysis", analysisId);
   if (selectedId) scopeQuery.set("peak", selectedId);
-  const selectedCandidate = detail?.component.candidates[candidateIndex]?.group_id;
+  const selectedCandidate = detail?.component.candidates[candidateIndex]?.group_id ?? requestedCandidate;
   if (selectedCandidate) scopeQuery.set("candidate", selectedCandidate);
   const dashboardHref = scopeQuery.size ? `/?${scopeQuery}` : "/";
   const acceptedHref = scopeQuery.size ? `/accepted?${scopeQuery}` : "/accepted";

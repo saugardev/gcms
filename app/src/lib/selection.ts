@@ -2,6 +2,12 @@ export type Selection = { ids: string[]; active: string; anchor: string };
 export type SelectionOptions = { toggle?: boolean; range?: boolean };
 export const emptySelection: Selection = { ids: [], active: "", anchor: "" };
 
+export function selectionFromRoute(current: Selection, requested: string | null, order: string[]): Selection {
+  return requested && requested !== current.active
+    ? selectComponent(current, requested, order)
+    : current;
+}
+
 export function selectAll(current: Selection, ids: string[]): Selection {
   const active = ids.includes(current.active) ? current.active : (ids[0] ?? "");
   return { ids, active, anchor: active };

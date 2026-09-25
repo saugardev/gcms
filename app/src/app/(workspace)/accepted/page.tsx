@@ -1,4 +1,3 @@
-import Workspace from "@/components/workspace";
 import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/session";
 
@@ -10,5 +9,5 @@ export default async function AcceptedPage({ searchParams }: { searchParams: Pro
     for (const key of ["analysis", "peak", "candidate"]) if (typeof params[key] === "string") query.set(key, params[key]);
     redirect(`/login?return_to=${encodeURIComponent(query.size ? `/accepted?${query}` : "/accepted")}`);
   }
-  return <Workspace key={JSON.stringify([params.analysis, params.peak, params.candidate])} user={user} view="accepted" />;
+  return null;
 }
