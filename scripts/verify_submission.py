@@ -178,7 +178,7 @@ def main():
             if (args.sample and "skipped=" in test_log) or "Ran 0 tests" in test_log:
                 raise RuntimeError("Configured submission checks must run without skips")
             evidence["tests"] = test_log[test_log.rfind("Ran ") :].strip()
-            run([str(clean / ".venv/bin/ruff"), "check", "gcms", "tests", "scripts"], clean)
+            run([str(clean / ".venv/bin/ruff"), "check", "services/python", "tests", "scripts"], clean)
             for engine in ("python", "rust"):
                 run(
                     [

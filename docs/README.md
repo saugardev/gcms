@@ -112,7 +112,7 @@ Individual checks:
 
 ```sh
 uv run --locked python -m unittest discover -s tests -v
-uv run --locked ruff check gcms tests scripts
+uv run --locked ruff check services/python tests scripts
 uv run --locked gcms evaluate
 uv run --locked gcms benchmark --repeats 5
 uv run --locked gcms export-bundle

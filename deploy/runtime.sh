@@ -53,7 +53,7 @@ export GCMS_LIBRARY="$root/data/library.msp" GCMS_SAMPLE="$root/data/sample.D"
 export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1
 .venv/bin/python -c 'from gcms.rust_backend import native; native()'
 .venv/bin/python -m unittest discover -s tests -v
-.venv/bin/ruff check gcms tests scripts
+.venv/bin/ruff check services/python tests scripts
 
 sudo -n tee /etc/systemd/system/gcms.service >/dev/null <<EOF
 [Unit]

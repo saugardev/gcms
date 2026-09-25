@@ -29,7 +29,7 @@ build-backend = "hatchling.build"
 packages = ["services/python/gcms"]
 
 [tool.hatch.build.targets.sdist]
-only-include = ["services/README.md", "services/python", "services/rust/src", "services/rust/Cargo.toml", "services/rust/Cargo.lock", "services/rust/build.rs", "services/rust/schema.sql", "tests", "scripts", "deploy", ".github/workflows", "rust-toolchain.toml", "pyproject.toml", "uv.lock", ".python-version", "README.md", "LICENSE", "docs", "examples"]
+only-include = ["services/README.md", "services/python", "services/rust/src", "services/rust/Cargo.toml", "services/rust/Cargo.lock", "services/rust/build.rs", "services/rust/schema.sql", "tests", "scripts", "deploy", ".github/workflows", "rust-toolchain.toml", "pyproject.toml", "uv.lock", ".python-version", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md", "docs", "examples"]
 exclude = ["**/__pycache__", "**/.DS_Store", "examples/reproducibility.json"]
 
 [tool.ruff]
