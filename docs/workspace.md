@@ -86,7 +86,7 @@ The existing live Python deployment is a separate application.
   also support multiple selection. Selected peaks are highlighted in the table and
   chromatogram. Selecting several components opens stacked spectra with a shared
   m/z axis; larger selections scroll inside the spectrum panel. Spectra are not summed.
-  Click a spectrum or its heading to make it active and inspect its saved library candidates.
+  Click a spectrum or its heading to make it active and inspect its library search results.
   The Library match tab returns to the active component's mirrored reference view.
 - Arrow keys move through table rows; Shift-arrow extends the selection. Home/End
   move to the first/last shown row, Ctrl/Cmd+A selects shown rows, and Escape clears
@@ -96,20 +96,23 @@ The existing live Python deployment is a separate application.
   a range. Switch to Zoom mode to magnify a region. Pan, focus the selected peak
   or group, or reset the chromatogram. Focusing a reviewed component uses its saved detailed peak trace;
   the overview uses the saved preview. Raw and corrected traces can be compared.
-- Search names, CAS numbers or component IDs; filter assignment and robustness
-  across processing settings together, and sort by retention time, area or similarity. Click an
-  assignment/robustness badge or “Labels & shortcuts” for explanations. These
+- Search names, CAS numbers or component IDs; filter identification status and parameter
+  sensitivity together, and sort by retention time, area or match score. Click an
+  identification/parameter sensitivity badge or “Labels & shortcuts” for explanations. These
   controls inspect and filter saved labels; they do not change analysis results.
 - Ambiguous components show “Why ambiguous?” above their candidates, using the
   saved warning flags, close-match count, score gap and ambiguity margin. Conflicting
   reference identities are explained separately. Missing reasons are reported explicitly.
 - Select a library candidate to change the lower half of the mirrored spectrum.
-  Component and reference intensities are independently normalized to 100%.
+  Component and reference spectra show relative abundance (%), with each spectrum's
+  base peak (strongest ion) normalized to 100%. The TIC and EIC show abundance in
+  instrument counts. Area (%) is the share of reported component-ion areas, not
+  concentration. Match score is spectral similarity on a 0–1 scale, not a NIST match factor.
 - Drag across a mass spectrum to zoom m/z in all comparison lanes together.
   Zoom/pan buttons work with the keyboard; Reset m/z or double-click restores the range.
 - Switch the chromatogram to Scan mode and click any acquisition time to see the
   nearest stored raw scan. The cursor marks its actual time and the chromatogram
-  pans to keep a newly requested scan in view. Raw scan also offers
+  pans to keep a newly requested scan in view. Scan spectrum also offers
   previous/next scan buttons and a retention-time input. Raw spectra preserve native
   mass values (1/20 Da), include background and are separate from reconstructed
   component spectra. The candidates panel identifies the component it belongs to.

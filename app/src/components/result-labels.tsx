@@ -13,7 +13,7 @@ export const stabilityLabels: Record<string, string> = {
   sensitive:
     "At least one processing variation changed the leading reference group or could no longer match the component.",
   inconclusive:
-    "Incomplete checks or uncertain correspondence prevented a clear robustness result.",
+    "Incomplete checks or uncertain correspondence prevented a clear parameter sensitivity result.",
 };
 
 export function ResultLabel({
@@ -31,7 +31,7 @@ export function ResultLabel({
       type="button"
       className={`result-label ${kind}`}
       title={description}
-      aria-label={`${kind === "assignment" ? "Assignment" : "Robustness"}: ${value}. Show explanation`}
+      aria-label={`${kind === "assignment" ? "Identification status" : "Parameter sensitivity"}: ${value}. Show explanation`}
       popoverTarget="result-guide"
       onClick={(event) => event.stopPropagation()}
     >
@@ -52,7 +52,7 @@ export function ResultGuide() {
       <div className="guide-heading">
         <div>
           <h2 id="guide-title">Workspace guide</h2>
-          <p>Two separate signals to help you review a component.</p>
+          <p>Identification status and parameter sensitivity for each component.</p>
         </div>
         <button
           popoverTarget="result-guide"
@@ -64,7 +64,7 @@ export function ResultGuide() {
       </div>
       <div className="guide-columns">
         <section>
-          <h3>Assignment</h3>
+          <h3>Identification status</h3>
           <p>How clearly does the spectrum match a library identity?</p>
           <dl>
             {Object.entries(assignments).map(([label, description]) => (
@@ -76,8 +76,8 @@ export function ResultGuide() {
           </dl>
         </section>
         <section>
-          <h3>Robustness</h3>
-          <p>Does the result persist when processing settings change?</p>
+          <h3>Parameter sensitivity</h3>
+          <p>Does the result persist when processing parameters change? This describes the analysis, not ion abundance or purity.</p>
           <dl>
             {Object.entries(stabilityLabels).map(([label, description]) => (
               <div key={label}>
@@ -99,7 +99,7 @@ export function ResultGuide() {
           ↑ / ↓ moves through the table; Shift + ↑ / ↓ extends the selection.
           Ctrl / ⌘ + A selects the shown rows. Escape clears the selection.
           Multiple selected components appear as stacked spectra with a shared
-          m/z axis. Click a spectrum or its heading to inspect its library candidates.
+          m/z axis. Click a spectrum or its heading to inspect its library search results.
         </p>
         <p>
           In Select mode, drag across the chromatogram to select peaks. Hold
@@ -116,7 +116,8 @@ export function ResultGuide() {
       </section>
       <p className="guide-note">
         Drag within a mass spectrum to zoom the shared m/z range. Each spectrum
-        is normalized to its own strongest ion. Raw scans retain native masses
+        shows relative abundance (%) with its own base peak (strongest ion) at 100%.
+        These percentages do not measure sample composition. Scan spectra retain acquired masses
         and include background; component spectra are reconstructed by the saved
         analysis.
       </p>

@@ -152,9 +152,9 @@ export function Chromatogram({
       <div className="panel-heading">
         <div>
           <div className="card-title">
-            <h2 id="tic-title">Total ion chromatogram</h2>
-            <CardInfo title="Total ion chromatogram">
-              Total detected ion signal over retention time. A peak can contain
+            <h2 id="tic-title">Total ion chromatogram (TIC)</h2>
+            <CardInfo title="Total ion chromatogram (TIC)">
+              Total ion abundance in instrument counts over retention time. A peak can contain
               more than one compound. Select peaks to inspect their spectra,
               drag to select or zoom, or use Scan to inspect an individual
               acquisition scan. Click an ion in the raw spectrum to overlay its
@@ -334,7 +334,7 @@ export function Chromatogram({
           ) : !ionTrace ? (
             <span>Loading…</span>
           ) : (
-            <span className="ion-scale-note">Same count scale</span>
+            <span className="ion-scale-note">Same abundance scale</span>
           )}
           <button
             aria-label="Clear extracted ion"
@@ -352,7 +352,7 @@ export function Chromatogram({
           width={width}
           height={h + 62}
           role="img"
-          aria-label="Total ion chromatogram. Select a component using the peak table or click near its retention time."
+          aria-label="Total ion chromatogram. Abundance in counts versus retention time in minutes. Select a component using the peak table or click near its retention time."
         >
           <defs>
             <clipPath id={clip}>
@@ -584,8 +584,8 @@ export function Chromatogram({
               ? "Ion trace unavailable"
               : "Loading ion trace…"
             : hoveredIndex >= 0
-            ? `${(hoverTimes[hoveredIndex] / 60).toFixed(3)} min · ${(hoverValues[hoveredIndex] ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} counts${ionTrace && (raw || corrected) ? ` · ion ${ionTrace.intensity[nearestIndex(rawTrace.time_seconds, hover!)]?.toLocaleString()} counts` : ""}`
-            : `Intensity · maximum ${maximum.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+            ? `RT ${(hoverTimes[hoveredIndex] / 60).toFixed(3)} min · Abundance ${(hoverValues[hoveredIndex] ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} counts${ionTrace && (raw || corrected) ? ` · EIC ${ionTrace.intensity[nearestIndex(rawTrace.time_seconds, hover!)]?.toLocaleString()} counts` : ""}`
+            : `Abundance (counts) · maximum ${maximum.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
         </span>
         <span>
           {!raw && !corrected && ionMz !== null
@@ -681,7 +681,7 @@ export function MassSpectrum({
         width={width}
         height={bottom + 36}
         role="img"
-        aria-label={`${items.map((i) => i.label).join(" versus ")} mass spectrum. Drag to zoom m/z.`}
+        aria-label={`${items.map((i) => i.label).join(" versus ")} mass spectrum. Relative abundance in percent versus m/z; each base peak is 100%. Drag to zoom m/z.`}
       >
         <defs>
           <clipPath id={plotId}>
@@ -905,7 +905,7 @@ export function MassSpectrum({
           </button>
           <button onClick={() => setRange(null)}>Reset m/z</button>
         </div>
-        <span>Drag to zoom · Relative %</span>
+        <span>Drag to zoom · Relative abundance (%)</span>
       </div>
       <div className="spectrum-scroll" ref={ref}>
         {mirrored ? (
@@ -948,8 +948,8 @@ export function MassSpectrum({
       </div>
       <div className="plot-caption spectrum-caption" aria-live="off">
         {hovered && ion >= 0
-          ? `m/z ${hovered.spectrum.mz[ion].toFixed(2)}${showCounts ? ` · ${hovered.spectrum.intensity[ion].toLocaleString()} counts` : ""} · ${((hovered.spectrum.intensity[ion] / Math.max(1, ...hovered.spectrum.intensity)) * 100).toFixed(1)}%`
-          : `${range[0].toFixed(1)}–${range[1].toFixed(1)} m/z · Each spectrum normalized independently`}
+          ? `m/z ${hovered.spectrum.mz[ion].toFixed(2)}${showCounts ? ` · Abundance ${hovered.spectrum.intensity[ion].toLocaleString()} counts` : ""} · Relative abundance ${((hovered.spectrum.intensity[ion] / Math.max(1, ...hovered.spectrum.intensity)) * 100).toFixed(1)}%`
+          : `Relative abundance (%) · ${range[0].toFixed(1)}–${range[1].toFixed(1)} m/z · Base peak = 100% in each spectrum`}
       </div>
     </>
   );

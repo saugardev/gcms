@@ -1021,13 +1021,14 @@ summary {
   text-transform: capitalize;
 }
 .table-filters select {
-  max-width: 135px;
+  max-width: none;
   min-width: 0;
+  flex: 0 0 auto;
   text-transform: capitalize;
 }
 @media (max-width: 1100px) {
   .table-filters select {
-    max-width: none;
+    flex: 1 0 auto;
     font-size: 10px;
     padding: 5px;
   }

@@ -436,7 +436,7 @@ export default function Workspace({ user }: { user: SessionUser }) {
                       Groups of ions detected by the saved analysis, each with a
                       retention time and proposed identity. Select a row to
                       inspect it; use checkboxes, Ctrl/⌘-click or Shift-click to
-                      compare several. Area % is relative signal area, not
+                      compare several. Area (%) is relative signal area, not
                       concentration.
                     </CardInfo>
                     <span className="count">{peaks.length}</span>
@@ -477,11 +477,11 @@ export default function Workspace({ user }: { user: SessionUser }) {
                   onChange={(e) => setQuery(e.target.value)}
                 />
                 <select
-                  aria-label="Filter by assignment"
+                  aria-label="Filter by identification status"
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
                 >
-                  <option value="all">All assignments</option>
+                  <option value="all">All identification statuses</option>
                   {Object.keys(assignments).map((value) => (
                     <option key={value} value={value}>
                       {human(value)} (
@@ -490,11 +490,11 @@ export default function Workspace({ user }: { user: SessionUser }) {
                   ))}
                 </select>
                 <select
-                  aria-label="Filter by robustness"
+                  aria-label="Filter by parameter sensitivity"
                   value={stability}
                   onChange={(event) => setStability(event.target.value)}
                 >
-                  <option value="all">Robustness: all</option>
+                  <option value="all">Parameter sensitivity: all</option>
                   {Object.keys(stabilityLabels).map((value) => (
                     <option key={value} value={value}>
                       {human(value)} (
@@ -514,9 +514,9 @@ export default function Workspace({ user }: { user: SessionUser }) {
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
                 >
-                  <option value="time">Time ↑</option>
-                  <option value="area">Area ↓</option>
-                  <option value="score">Similarity ↓</option>
+                  <option value="time">RT ↑</option>
+                  <option value="area">Area (%) ↓</option>
+                  <option value="score">Match score ↓</option>
                 </select>
               </div>
               <div className="table-scroll" ref={rows}>
@@ -531,12 +531,12 @@ export default function Workspace({ user }: { user: SessionUser }) {
                         <span className="sr-only">Select</span>
                       </th>
                       <th scope="col">RT (min)</th>
-                      <th scope="col">Leading proposal</th>
+                      <th scope="col">Best library match</th>
                       <th scope="col" className="numeric">
-                        Area %
+                        Area (%)
                       </th>
                       <th scope="col" className="numeric">
-                        Similarity
+                        Match score
                       </th>
                     </tr>
                   </thead>
@@ -678,18 +678,19 @@ export default function Workspace({ user }: { user: SessionUser }) {
               <div className="panel-heading">
                 <div>
                   <div className="card-title">
-                    <h2 id="candidates-title">Library candidates</h2>
-                    <CardInfo title="Library candidates">
+                    <h2 id="candidates-title">Library search results</h2>
+                    <CardInfo title="Library search results">
                       Library entries with spectra resembling the active
-                      component, ranked by similarity. Select a candidate to
-                      compare its reference spectrum. Similarity is not a
-                      probability, and a leading match does not confirm chemical
+                      component, ranked by match score (spectral similarity from
+                      0 to 1; higher is a closer match). Select a candidate to
+                      compare its reference spectrum. This is not a NIST match
+                      factor or an identification probability. A leading match does not confirm chemical
                       identity. Analyst decisions are shared with all registered users. Accepting a candidate group does not distinguish identities within it.
                     </CardInfo>
                   </div>
                   <p>
                     {selected
-                      ? `Saved candidates for #${selected.component_id.replace("component-", "")} · ${minutes(selected.apex_seconds)} min`
+                      ? `Library matches for #${selected.component_id.replace("component-", "")} · RT ${minutes(selected.apex_seconds)} min`
                       : "Select a component to inspect its library matches"}
                   </p>
                 </div>
@@ -707,13 +708,13 @@ export default function Workspace({ user }: { user: SessionUser }) {
                   <>
                     <div className="component-facts">
                       <span>
-                        Integrated area{" "}
+                        Area (%){" "}
                         <strong>
                           {detail.component.area_percent.toFixed(2)}%
                         </strong>
                       </span>
                       <span>
-                        Window{" "}
+                        Integration range{" "}
                         <strong>
                           {minutes(detail.component.start_seconds)}–
                           {minutes(detail.component.end_seconds)} min
@@ -721,7 +722,7 @@ export default function Workspace({ user }: { user: SessionUser }) {
                       </span>
                       {detail.review && (
                         <span>
-                          Robustness{" "}
+                          Parameter sensitivity{" "}
                           <ResultLabel
                             value={detail.review.label}
                             kind="stability"
@@ -768,7 +769,7 @@ export default function Workspace({ user }: { user: SessionUser }) {
                               </span>
                               <span className="candidate-score">
                                 {c.score.toFixed(3)}
-                                <small>similarity</small>
+                                <small>match score</small>
                               </span>
                             </button>
                             <div className="candidate-decision">
@@ -822,7 +823,7 @@ export default function Workspace({ user }: { user: SessionUser }) {
           </div>
           <footer className="workspace-footer">
             <span>
-              Identities are proposals · Similarity is not a probability · Area
+              Library matches require confirmation · Match score is not a probability · Area
               is not concentration
             </span>
             <button className="help-link" popoverTarget="result-guide">

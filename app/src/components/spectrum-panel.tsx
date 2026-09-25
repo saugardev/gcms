@@ -112,10 +112,10 @@ export function SpectrumPanel({
         : !scan;
   const title =
     view === "compare"
-      ? "Compare spectra"
+      ? "Mass spectrum comparison"
       : view === "raw"
-        ? "Raw scan spectrum"
-        : "Mass spectrum";
+        ? "Scan mass spectrum"
+        : "Component mass spectrum";
   return (
     <section className="panel spectrum-panel" aria-labelledby="spectrum-title">
       <div className="panel-heading">
@@ -124,10 +124,10 @@ export function SpectrumPanel({
             <h2 id="spectrum-title">{title}</h2>
             <CardInfo title={title}>
               {view === "compare"
-                ? "A separate spectrum for every selected component on the same mass-to-charge (m/z) axis. Each is scaled to its own strongest ion (100%), so compare ion patterns, not amounts. Zoom applies to all spectra; click a spectrum or its heading to activate its component and inspect its library candidates."
+                ? "A separate mass spectrum for every selected component on the same mass-to-charge (m/z) axis. Relative abundance is scaled to each spectrum’s base peak (strongest ion = 100%); these percentages do not measure composition. Zoom applies to all spectra; click a spectrum or its heading to activate its component and inspect its library search results."
                 : view === "raw"
-                  ? "Ions recorded in one acquisition scan, including background. Click an ion or enter its m/z to show its signal over time on the chromatogram. Use the scan arrows or time input to move through the acquisition. The plot is scaled to its strongest ion (100%); hover to see counts."
-                  : "The selected component’s reconstructed ion pattern by mass-to-charge ratio (m/z). Blue sticks show the component; gray sticks below show the chosen library reference. Each spectrum is scaled to its strongest ion (100%). Drag to zoom and compare the patterns."}
+                  ? "Ions recorded in one acquisition scan, including background. Click an ion or enter its m/z to display its extracted ion chromatogram (EIC). Use the scan arrows or retention time input to move through the acquisition. Relative abundance is scaled to the base peak (strongest ion = 100%); hover to see abundance in counts."
+                  : "The selected component’s reconstructed mass spectrum. Blue sticks show the component; gray sticks below show the chosen library spectrum. Relative abundance is scaled to each spectrum’s base peak (strongest ion = 100%); these percentages do not measure composition. Drag to zoom and compare the patterns."}
             </CardInfo>
           </div>
           <p>
@@ -170,7 +170,7 @@ export function SpectrumPanel({
           }
           onClick={() => onViewChange("raw")}
         >
-          Raw scan
+          Scan spectrum
         </button>
       </div>
       {view === "raw" && (
@@ -293,18 +293,18 @@ export function SpectrumPanel({
             series={[
               {
                 id: `scan-${scan.scan_index}`,
-                label: "Acquired ions · native m/z",
+                label: "Scan spectrum · acquired m/z",
                 spectrum: scan.spectrum,
               },
             ]}
             massRange={massRange}
           />
           <p className="raw-scan-note">
-            Total ion count{" "}
+            Total ion abundance{" "}
             {scan.spectrum.intensity
               .reduce((sum, value) => sum + value, 0)
               .toLocaleString()}{" "}
-            · No background subtraction
+            counts · No background subtraction
           </p>
         </>
       ) : view === "library" && detail ? (
