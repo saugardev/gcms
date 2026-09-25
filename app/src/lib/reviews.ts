@@ -16,3 +16,11 @@ export function mergeReviews(current: Record<string, ComponentReview>, incoming:
   }
   return next;
 }
+
+export function acceptedComponents(peaks: Peak[], reviews: Record<string, ComponentReview>) {
+  return peaks.flatMap((peak) => {
+    const decision = reviews[peak.component_id]?.decisions.find((item) => item.decision === "accepted");
+    return decision ? [{ peak, decision }] : [];
+  }).sort((a, b) => a.peak.apex_seconds - b.peak.apex_seconds);
+}
+import type { Peak } from "./api.ts";

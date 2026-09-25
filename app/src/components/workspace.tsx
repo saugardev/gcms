@@ -12,7 +12,10 @@ import { Chromatogram } from "./plots";
 import { CardInfo } from "./card-info";
 import { SpectrumPanel, type SpectrumView } from "./spectrum-panel";
 import { useSharedReviews } from "./use-shared-reviews";
+import { WorkspaceSidebar } from "./workspace-sidebar";
 import { ReviewNotifications } from "./review-notifications";
+import { AcceptedComponents } from "./accepted-components";
+import { acceptedComponents } from "@/lib/reviews";
 import type { SessionUser } from "@/lib/session";
 import { ambiguityReasons } from "@/lib/assignments";
 import {
@@ -33,19 +36,7 @@ import {
 const minutes = (seconds: number) => (seconds / 60).toFixed(3);
 const human = (value: string) => value.replaceAll("_", " ");
 
-export default function Workspace({ user }: { user: SessionUser }) {
-  const [signingOut, setSigningOut] = useState(false);
-  const [signOutError, setSignOutError] = useState("");
-  async function signOut() {
-    setSigningOut(true); setSignOutError("");
-    try {
-      const response = await fetch("/api/auth/logout", { method: "POST" });
-      if (!response.ok && response.status !== 401) throw new Error();
-      location.assign("/login");
-    } catch {
-      setSignOutError("Could not sign out. Please try again."); setSigningOut(false);
-    }
-  }
+export default function Workspace({ user, view = "dashboard" }: { user: SessionUser; view?: "dashboard" | "accepted" }) {
   const [analyses, setAnalyses] = useState<AnalysisSummary[] | null>(null);
   const [analysisId, setAnalysisId] = useState("");
   const shared = useSharedReviews(analysisId);
@@ -179,7 +170,7 @@ export default function Workspace({ user }: { user: SessionUser }) {
     const requestedCandidate = previous.get("peak") === selectedId ? previous.get("candidate") : null;
     if (requestedCandidate) params.set("candidate", requestedCandidate);
     history.replaceState(null, "", `?${params}`);
-    if (!selectedId) return;
+    if (!selectedId || view === "accepted") return;
     const key = `${analysis.id}/${selectedId}`;
     const saved = cache.current.get(key);
     function showDetail(result: ComponentDetail) {
@@ -202,7 +193,7 @@ export default function Workspace({ user }: { user: SessionUser }) {
           if (!controller.signal.aborted) setDetailError(err.message);
         });
     return () => controller.abort();
-  }, [analysis, selectedId, detailRetry]);
+  }, [analysis, selectedId, detailRetry, view]);
 
   const peaks = useMemo(
     () =>
@@ -287,50 +278,35 @@ export default function Workspace({ user }: { user: SessionUser }) {
     }
   }, [selectedId, peaks]);
 
+  const accepted = useMemo(() => acceptedComponents(analysis?.peaks ?? [], shared.reviews), [analysis, shared.reviews]);
+  const scopeQuery = new URLSearchParams();
+  if (analysisId) scopeQuery.set("analysis", analysisId);
+  if (selectedId) scopeQuery.set("peak", selectedId);
+  const selectedCandidate = detail?.component.candidates[candidateIndex]?.group_id;
+  if (selectedCandidate) scopeQuery.set("candidate", selectedCandidate);
+  const dashboardHref = scopeQuery.size ? `/?${scopeQuery}` : "/";
+  const acceptedHref = scopeQuery.size ? `/accepted?${scopeQuery}` : "/accepted";
+
   return (
-    <main className="workspace">
-      <header className="app-header">
-        <div className="wordmark">
-          <img
-            className="brand-logo"
-            src="/mafer-logo.svg"
-            alt="Mafer"
-            width={104}
-            height={21}
-          />
-          <div>
-            <h1>Analyst workspace</h1>
-            <p>GC–MS · Saved analysis</p>
+    <div className="workspace-shell">
+      <WorkspaceSidebar user={user} analyses={analyses} analysisId={analysisId}
+        onSelect={(id) => {
+          history.replaceState(null, "", `${view === "accepted" ? "/accepted" : "/"}?${new URLSearchParams({ analysis: id })}`);
+          setAnalysis(null); setSelection(emptySelection); setAnalysisId(id);
+        }}
+        view={view} dashboardHref={dashboardHref} acceptedHref={acceptedHref}
+        acceptedCount={shared.loaded && analysis ? accepted.length : null} />
+      <div className="workspace-column">
+        <header className="workspace-topbar">
+          <div className="page-heading"><span>Workspace</span><h1>{view === "accepted" ? "Accepted components" : "Dashboard"}</h1></div>
+          <div className="topbar-actions">
+            <div className="reload-controls"><button onClick={() => setRetry((n) => n + 1)}>Reload sample</button>
+              <span className="load-time" aria-live="polite">{loadMs !== null ? `Loaded in ${Math.round(loadMs)} ms` : analysisId && !error ? "Loading…" : ""}</span>
+            </div>
+            <ReviewNotifications events={shared.notifications} connection={shared.connection} userId={user.id} onDismiss={shared.dismiss} />
           </div>
-        </div>
-        <div className="sample-controls">
-          <label className="sr-only" htmlFor="sample">
-            Saved sample
-          </label>
-          <select
-            id="sample"
-            value={analysisId}
-            onChange={(e) => setAnalysisId(e.target.value)}
-            disabled={!analyses?.length}
-          >
-            {analyses?.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.sample_name}
-              </option>
-            ))}
-          </select>
-          <button onClick={() => setRetry((n) => n + 1)}>Reload sample</button>
-          <span className="load-time" aria-live="polite">
-            {loadMs !== null
-              ? `Loaded in ${Math.round(loadMs)} ms`
-              : analysisId && !error
-                ? "Loading…"
-                : ""}
-          </span>
-        </div>
-        <div className="account-controls"><span>{user.name}</span><button disabled={signingOut} onClick={signOut}>{signingOut ? "Signing out…" : "Sign out"}</button>{signOutError && <span role="alert">{signOutError}</span>}</div>
-        <ReviewNotifications events={shared.notifications} connection={shared.connection} userId={user.id} onDismiss={shared.dismiss} />
-      </header>
+        </header>
+        <main className={`workspace${view === "accepted" ? " accepted-workspace" : ""}`}>
       {error ? (
         <section className="state-page" role="alert">
           <h2>Could not load this analysis</h2>
@@ -366,7 +342,8 @@ export default function Workspace({ user }: { user: SessionUser }) {
             </span>
             <span className="saved-indicator">Saved result</span>
           </div>
-          <div className="workspace-grid">
+          {view === "accepted" ? <AcceptedComponents key={analysis.id} analysisId={analysis.id} rows={accepted}
+            loaded={shared.loaded} connection={shared.connection} dashboardHref={dashboardHref} /> : <div className="workspace-grid">
             <Chromatogram
               key={analysis.id}
               analysis={analysis}
@@ -820,7 +797,7 @@ export default function Workspace({ user }: { user: SessionUser }) {
                 )}
               </div>
             </section>
-          </div>
+          </div>}
           <footer className="workspace-footer">
             <span>
               Library matches require confirmation · Match score is not a probability · Area
@@ -833,6 +810,8 @@ export default function Workspace({ user }: { user: SessionUser }) {
         </>
       )}
       <ResultGuide />
-    </main>
+        </main>
+      </div>
+    </div>
   );
 }

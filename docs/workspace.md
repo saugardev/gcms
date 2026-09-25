@@ -79,6 +79,13 @@ The existing live Python deployment is a separate application.
 
 ## Analyst interactions
 
+- The sidebar's Project selector chooses the saved sample for both Dashboard and
+  Accepted components. Sign out is at the bottom of the sidebar. The top bar keeps
+  Reload sample and the notifications box available on both pages.
+- Accepted components lists shared analyst acceptances in retention-time order,
+  with area, reviewer and decision time. Search by candidate, component or reviewer;
+  View component opens that specific accepted candidate in the dashboard. The list
+  updates when a teammate accepts, rejects or clears a decision.
 - Chromatogram and mirrored mass spectrum stay open alongside the component and
   candidate lists on desktop. Lists scroll independently; small screens stack.
 - Click a detected peak or table row to inspect it. Ctrl/Cmd-click toggles a
